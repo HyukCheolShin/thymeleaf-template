@@ -19,3 +19,17 @@ mybatis:
     map-underscore-to-camel-case: true
     jdbc-type-for-null: NULL
     default-statement-timeout: 30
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+logging:
+  level:
+    root: INFO
+    p6spy: INFO
+    org.springframework.jdbc: WARN
+    com.example.thymeleaf_template: DEBUG
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+      logging: slf4j
