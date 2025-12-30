@@ -2,7 +2,11 @@ spring:
   application:
     name: thymeleaf-template
   datasource:
-    url: jdbc:postgresql://192.168.56.6:5432/template
-    username: template_user
-    password: template_pwd
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 1234
     driver-class-name: org.postgresql.Driver
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
