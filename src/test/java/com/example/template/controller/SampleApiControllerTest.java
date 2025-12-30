@@ -14,11 +14,14 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -27,83 +30,107 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser
 class SampleApiControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @MockitoBean
-    private SampleService sampleService;
+        @MockitoBean
+        private SampleService sampleService;
 
-    @Test
-    @DisplayName("전체 샘플 목록 조회 성공")
-    void getAllSamples() throws Exception {
-        // given
-        Map<String, Object> sample1 = Map.of(
-                "id", 1L,
-                "name", "홍길동",
-                "email", "user1@example.com",
-                "password", "password123",
-                "role", "USER",
-                "created_at", "2025-01-01T12:00:00",
-                "updated_at", "2025-01-01T12:00:00");
-        given(sampleService.getAllSamples()).willReturn(List.of(sample1));
+        @Test
+        @DisplayName("전체 샘플 목록 조회 성공")
+        void getAllSamples() throws Exception {
+                // given
+                Map<String, Object> sample1 = Map.of(
+                                "id", 1L,
+                                "name", "홍길동",
+                                "email", "user1@example.com",
+                                "password", "password123",
+                                "role", "USER",
+                                "created_at", "2025-01-01T12:00:00",
+                                "updated_at", "2025-01-01T12:00:00");
+                given(sampleService.getAllSamples()).willReturn(List.of(sample1));
 
-        // when & then
-        mockMvc.perform(get("/api/samples/")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].name").value("홍길동"))
-                .andExpect(jsonPath("$[0].email").value("user1@example.com"))
-                .andExpect(jsonPath("$[0].password").value("password123"))
-                .andExpect(jsonPath("$[0].role").value("USER"))
-                .andExpect(jsonPath("$[0].updated_at").value("2025-01-01T12:00:00"))
-                .andExpect(jsonPath("$[0].created_at").value("2025-01-01T12:00:00"));
-    }
+                // when & then
+                mockMvc.perform(get("/api/samples/")
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(jsonPath("$[0].id").value(1))
+                                .andExpect(jsonPath("$[0].name").value("홍길동"))
+                                .andExpect(jsonPath("$[0].email").value("user1@example.com"))
+                                .andExpect(jsonPath("$[0].password").value("password123"))
+                                .andExpect(jsonPath("$[0].role").value("USER"))
+                                .andExpect(jsonPath("$[0].updated_at").value("2025-01-01T12:00:00"))
+                                .andExpect(jsonPath("$[0].created_at").value("2025-01-01T12:00:00"));
+        }
 
-    @Test
-    @DisplayName("ID로 샘플 조회 성공")
-    void getSampleById() throws Exception {
-        // given
-        Long id = 1L;
-        Map<String, Object> sample = Map.of(
-                "id", id,
-                "name", "홍길동",
-                "email", "user1@example.com",
-                "password", "password123",
-                "role", "USER",
-                "created_at", "2025-01-01T12:00:00",
-                "updated_at", "2025-01-01T12:00:00");
-        given(sampleService.getSampleById(id)).willReturn(sample);
+        @Test
+        @DisplayName("ID로 샘플 조회 성공")
+        void getSampleById() throws Exception {
+                // given
+                Long id = 1L;
+                Map<String, Object> sample = Map.of(
+                                "id", id,
+                                "name", "홍길동",
+                                "email", "user1@example.com",
+                                "password", "password123",
+                                "role", "USER",
+                                "created_at", "2025-01-01T12:00:00",
+                                "updated_at", "2025-01-01T12:00:00");
+                given(sampleService.getSampleById(id)).willReturn(sample);
 
-        // when & then
-        mockMvc.perform(get("/api/samples/{id}", id)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("홍길동"))
-                .andExpect(jsonPath("$.email").value("user1@example.com"))
-                .andExpect(jsonPath("$.password").value("password123"))
-                .andExpect(jsonPath("$.role").value("USER"))
-                .andExpect(jsonPath("$.updated_at").value("2025-01-01T12:00:00"))
-                .andExpect(jsonPath("$.created_at").value("2025-01-01T12:00:00"));
-    }
+                // when & then
+                mockMvc.perform(get("/api/samples/{id}", id)
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(jsonPath("$.id").value(1))
+                                .andExpect(jsonPath("$.name").value("홍길동"))
+                                .andExpect(jsonPath("$.email").value("user1@example.com"))
+                                .andExpect(jsonPath("$.password").value("password123"))
+                                .andExpect(jsonPath("$.role").value("USER"))
+                                .andExpect(jsonPath("$.updated_at").value("2025-01-01T12:00:00"))
+                                .andExpect(jsonPath("$.created_at").value("2025-01-01T12:00:00"));
+        }
 
-    @Test
-    @DisplayName("샘플 등록 성공")
-    void saveSample() throws Exception {
-        // given
-        // params setup removed as it is directly used in content string
+        @Test
+        @DisplayName("샘플 등록 성공")
+        void saveSample() throws Exception {
+                // given
+                // params setup removed as it is directly used in content string
 
-        // when & then
-        mockMvc.perform(post("/api/samples/")
-                .with(csrf()) // Spring Security testing usually requires CSRF token for POST
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                        "{\"email\":\"newuser@example.com\",\"password\":\"newpassword\",\"name\":\"New User\",\"role\":\"USER\"}"))
-                .andExpect(status().isOk());
+                // when & then
+                mockMvc.perform(post("/api/samples/")
+                                .with(csrf()) // Spring Security testing usually requires CSRF token for POST
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                                "{\"email\":\"newuser@example.com\",\"password\":\"newpassword\",\"name\":\"New User\",\"role\":\"USER\"}"))
+                                .andExpect(status().isOk());
 
-        verify(sampleService).saveSample(any());
-    }
+                verify(sampleService).saveSample(any());
+        }
+
+        @Test
+        @DisplayName("샘플 수정 성공")
+        void updateSample() throws Exception {
+                // when & then
+                mockMvc.perform(put("/api/samples/1")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"email\":\"updated@example.com\",\"password\":\"newpassword\",\"name\":\"Updated User\",\"role\":\"ADMIN\"}"))
+                                .andExpect(status().isOk());
+
+                verify(sampleService).updateSample(any());
+        }
+
+        @Test
+        @DisplayName("샘플 삭제 성공")
+        void deleteSample() throws Exception {
+                // when & then
+                mockMvc.perform(delete("/api/samples/1")
+                                .with(csrf()))
+                                .andExpect(status().isOk());
+
+                verify(sampleService).deleteSample(eq(1L));
+        }
 }

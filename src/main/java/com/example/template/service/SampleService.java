@@ -25,4 +25,12 @@ public class SampleService {
     public void saveSample(Map<String, Object> params) {
         sampleMapper.insert(params);
     }
+
+    public void updateSample(Map<String, Object> params) {
+        sampleMapper.update(params);
+    }
+
+    public void deleteSample(Long id) {
+        sampleMapper.delete(id);
+    }
 }

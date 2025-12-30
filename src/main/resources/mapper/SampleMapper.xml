@@ -15,4 +15,18 @@
         VALUES (#{email}, #{password}, #{name}, #{role})
     </insert>
 
+    <update id="update" parameterType="map">
+        UPDATE sample
+        SET email = #{email},
+            password = #{password},
+            name = #{name},
+            role = #{role},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM sample WHERE id = #{id}
+    </delete>
+
 </mapper>

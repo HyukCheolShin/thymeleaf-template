@@ -11,4 +11,8 @@ public interface SampleMapper {
     Map<String, Object> findById(Long id);
 
     void insert(Map<String, Object> params);
+
+    void update(Map<String, Object> params);
+
+    void delete(Long id);
 }
