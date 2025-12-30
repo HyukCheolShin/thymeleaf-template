@@ -33,7 +33,14 @@ class SampleApiControllerTest {
     @DisplayName("전체 샘플 목록 조회 성공")
     void getAllSamples() throws Exception {
         // given
-        Map<String, Object> sample1 = Map.of("id", 1L, "params", "test1");
+        Map<String, Object> sample1 = Map.of(
+                "id", 1L,
+                "name", "홍길동",
+                "email", "user1@example.com",
+                "password", "password123",
+                "role", "USER",
+                "created_at", "2025-01-01T12:00:00",
+                "updated_at", "2025-01-01T12:00:00");
         given(sampleService.getAllSamples()).willReturn(List.of(sample1));
 
         // when & then
@@ -42,7 +49,12 @@ class SampleApiControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].params").value("test1"));
+                .andExpect(jsonPath("$[0].name").value("홍길동"))
+                .andExpect(jsonPath("$[0].email").value("user1@example.com"))
+                .andExpect(jsonPath("$[0].password").value("password123"))
+                .andExpect(jsonPath("$[0].role").value("USER"))
+                .andExpect(jsonPath("$[0].updated_at").value("2025-01-01T12:00:00"))
+                .andExpect(jsonPath("$[0].created_at").value("2025-01-01T12:00:00"));
     }
 
     @Test
@@ -50,7 +62,14 @@ class SampleApiControllerTest {
     void getSampleById() throws Exception {
         // given
         Long id = 1L;
-        Map<String, Object> sample = Map.of("id", id, "params", "test1");
+        Map<String, Object> sample = Map.of(
+                "id", id,
+                "name", "홍길동",
+                "email", "user1@example.com",
+                "password", "password123",
+                "role", "USER",
+                "created_at", "2025-01-01T12:00:00",
+                "updated_at", "2025-01-01T12:00:00");
         given(sampleService.getSampleById(id)).willReturn(sample);
 
         // when & then
@@ -59,6 +78,11 @@ class SampleApiControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.params").value("test1"));
+                .andExpect(jsonPath("$.name").value("홍길동"))
+                .andExpect(jsonPath("$.email").value("user1@example.com"))
+                .andExpect(jsonPath("$.password").value("password123"))
+                .andExpect(jsonPath("$.role").value("USER"))
+                .andExpect(jsonPath("$.updated_at").value("2025-01-01T12:00:00"))
+                .andExpect(jsonPath("$.created_at").value("2025-01-01T12:00:00"));
     }
 }

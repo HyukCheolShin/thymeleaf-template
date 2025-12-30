@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Sample List</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/jquery-3.7.1.min.js"></script>
+</head>
+
+
+<body>
+    <h1>Sample List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+            </tr>
+        </thead>
+        <tbody id="sampleTableBody">
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/api/samples/',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var tableBody = $('#sampleTableBody');
+                    tableBody.empty(); // Clear existing data if any
+
+                    $.each(data, function (index, sample) {
+                        var row = $('<tr>');
+                        row.append($('<td>').text(sample.id));
+                        row.append($('<td>').text(sample.email));
+                        row.append($('<td>').text(sample.password));
+                        row.append($('<td>').text(sample.name));
+                        row.append($('<td>').text(sample.role));
+                        row.append($('<td>').text(sample.created_at));
+                        row.append($('<td>').text(sample.updated_at));
+                        tableBody.append(row);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching samples:", error);
+                    alert("데이터를 불러오는 중 오류가 발생했습니다.");
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
