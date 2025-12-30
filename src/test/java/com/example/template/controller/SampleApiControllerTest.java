@@ -13,8 +13,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -84,5 +88,22 @@ class SampleApiControllerTest {
                 .andExpect(jsonPath("$.role").value("USER"))
                 .andExpect(jsonPath("$.updated_at").value("2025-01-01T12:00:00"))
                 .andExpect(jsonPath("$.created_at").value("2025-01-01T12:00:00"));
+    }
+
+    @Test
+    @DisplayName("샘플 등록 성공")
+    void saveSample() throws Exception {
+        // given
+        // params setup removed as it is directly used in content string
+
+        // when & then
+        mockMvc.perform(post("/api/samples/")
+                .with(csrf()) // Spring Security testing usually requires CSRF token for POST
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        "{\"email\":\"newuser@example.com\",\"password\":\"newpassword\",\"name\":\"New User\",\"role\":\"USER\"}"))
+                .andExpect(status().isOk());
+
+        verify(sampleService).saveSample(any());
     }
 }

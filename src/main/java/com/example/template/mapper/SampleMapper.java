@@ -9,4 +9,6 @@ public interface SampleMapper {
     List<Map<String, Object>> findAll();
 
     Map<String, Object> findById(Long id);
+
+    void insert(Map<String, Object> params);
 }

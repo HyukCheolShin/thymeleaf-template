@@ -21,4 +21,8 @@ public class SampleService {
     public Map<String, Object> getSampleById(Long id) {
         return sampleMapper.findById(id);
     }
+
+    public void saveSample(Map<String, Object> params) {
+        sampleMapper.insert(params);
+    }
 }
