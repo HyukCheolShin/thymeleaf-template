@@ -37,11 +37,27 @@ public class SampleService {
     }
 
     public void saveSample(Map<String, Object> params) {
+        validate(params);
         sampleMapper.insert(params);
     }
 
     public void updateSample(Map<String, Object> params) {
+        validate(params);
         sampleMapper.update(params);
+    }
+
+    private void validate(Map<String, Object> params) {
+        if (params == null || params.isEmpty()) {
+            throw new IllegalArgumentException("Request body cannot be empty");
+        }
+
+        String[] requiredFields = { "name", "email", "password", "role" };
+        for (String field : requiredFields) {
+            Object value = params.get(field);
+            if (value == null || value.toString().trim().isEmpty()) {
+                throw new IllegalArgumentException("Field '" + field + "' is required");
+            }
+        }
     }
 
     public void deleteSample(Long id) {

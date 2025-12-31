@@ -32,6 +32,14 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("BAD_REQUEST", "Invalid value for parameter: " + ex.getName()));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        logger.error("Invalid argument: ", ex);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("BAD_REQUEST", ex.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
         logger.error("Unhandled exception occurred: ", ex);

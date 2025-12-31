@@ -15,10 +15,13 @@ import com.example.template.common.dto.PageRequest;
 import com.example.template.common.dto.PageResponse;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap; // Added import
+import com.fasterxml.jackson.databind.ObjectMapper; // Added import
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow; // Added import
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -36,6 +39,9 @@ class SampleApiControllerTest {
 
         @Autowired
         private MockMvc mockMvc;
+
+        @Autowired
+        private ObjectMapper objectMapper; // Added ObjectMapper injection
 
         @MockitoBean
         private SampleService sampleService;
@@ -204,5 +210,23 @@ class SampleApiControllerTest {
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                                 .andExpect(jsonPath("$.code").value("BAD_REQUEST"))
                                 .andExpect(jsonPath("$.message").value("Invalid value for parameter: id"));
+        }
+
+        @Test
+        @DisplayName("필수 값 누락 시 400 에러 반환")
+        void validationTest() throws Exception {
+                // given
+                Map<String, Object> params = new HashMap<>(); // Empty params
+                willThrow(new IllegalArgumentException("Field 'name' is required")).given(sampleService)
+                                .saveSample(any());
+
+                // when & then
+                mockMvc.perform(post("/api/samples/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(params))
+                                .with(csrf()))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.code").value("BAD_REQUEST"))
+                                .andExpect(jsonPath("$.message").value("Field 'name' is required"));
         }
 }
