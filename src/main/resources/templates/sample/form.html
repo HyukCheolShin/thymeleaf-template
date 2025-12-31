@@ -64,7 +64,12 @@
                         $('#role').val(data.role);
                     },
                     error: function (xhr) {
-                        alert('데이터 로딩 실패: ' + xhr.status);
+                        var msg = '데이터 로딩 실패';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        alert(msg);
+                        window.history.back();
                     }
                 });
             }
@@ -98,7 +103,11 @@
                         window.location.href = '/samples';
                     },
                     error: function (xhr) {
-                        alert('저장 실패: ' + xhr.status);
+                        var msg = '저장 실패';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        alert(msg);
                     }
                 });
             });

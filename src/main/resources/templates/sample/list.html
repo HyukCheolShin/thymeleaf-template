@@ -98,9 +98,12 @@
                         alert('삭제되었습니다.');
                         loadSamples(currentPage);
                     },
-                    error: function (xhr, status, error) {
-                        console.error("Error deleting sample:", error);
-                        alert("삭제 중 오류가 발생했습니다.");
+                    error: function (xhr) {
+                        var msg = '삭제 중 오류가 발생했습니다.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        alert(msg);
                     }
                 });
             });
@@ -161,9 +164,12 @@
 
                         renderPagination(totalPages, currentPage);
                     },
-                    error: function (xhr, status, error) {
-                        console.error("Error fetching samples:", error);
-                        alert("데이터를 불러오는 중 오류가 발생했습니다.");
+                    error: function (xhr) {
+                        var msg = "데이터를 불러오는 중 오류가 발생했습니다.";
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        alert(msg);
                     }
                 });
             }
