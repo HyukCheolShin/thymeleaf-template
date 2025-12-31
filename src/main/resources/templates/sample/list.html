@@ -8,6 +8,7 @@
     <title>Sample List</title>
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/common.js"></script>
     <meta name="_csrf" th:content="${_csrf.token}" />
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
@@ -57,14 +58,7 @@
 
     <script>
         $(document).ready(function () {
-            var token = $("meta[name='_csrf']").attr("content");
-            var header = $("meta[name='_csrf_header']").attr("content");
-
-            $.ajaxSetup({
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader(header, token);
-                }
-            });
+            // CSRF handled by common.js
 
             var currentPage = 1;
             var pageSize = 10;
@@ -99,11 +93,7 @@
                         loadSamples(currentPage);
                     },
                     error: function (xhr) {
-                        var msg = '삭제 중 오류가 발생했습니다.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            msg = xhr.responseJSON.message;
-                        }
-                        alert(msg);
+                        App.handleAjaxError(xhr, '삭제 중 오류가 발생했습니다.');
                     }
                 });
             });
@@ -165,11 +155,7 @@
                         renderPagination(totalPages, currentPage);
                     },
                     error: function (xhr) {
-                        var msg = "데이터를 불러오는 중 오류가 발생했습니다.";
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            msg = xhr.responseJSON.message;
-                        }
-                        alert(msg);
+                        App.handleAjaxError(xhr, '데이터를 불러오는 중 오류가 발생했습니다.');
                     }
                 });
             }
