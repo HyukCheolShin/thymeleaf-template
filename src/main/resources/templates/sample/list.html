@@ -63,6 +63,36 @@
             let currentPage = 1;
             const pageSize = 10;
 
+            const renderPagination = (totalPages, currentPage) => {
+                const paginationDiv = $('#pagination');
+                paginationDiv.empty();
+
+                if (totalPages <= 1) return;
+
+                // Previous Button
+                if (currentPage > 1) {
+                    paginationDiv.append(`<a href="#" class="page-link" data-page="${currentPage - 1}" style="margin: 0 5px;">&laquo; Prev</a>`);
+                }
+
+                // Page Numbers
+                const startPage = Math.max(1, currentPage - 2);
+                const endPage = Math.min(totalPages, currentPage + 2);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const link = $(`<a href="#" class="page-link" data-page="${i}" style="margin: 0 5px;">${i}</a>`);
+                    if (i === currentPage) {
+                        link.css('font-weight', 'bold');
+                        link.css('text-decoration', 'underline');
+                    }
+                    paginationDiv.append(link);
+                }
+
+                // Next Button
+                if (currentPage < totalPages) {
+                    paginationDiv.append(`<a href="#" class="page-link" data-page="${currentPage + 1}" style="margin: 0 5px;">Next &raquo;</a>`);
+                }
+            };
+
             // Function to load samples
             const loadSamples = (page = 1) => {
                 const keyword = $('#keyword').val();
@@ -156,36 +186,6 @@
                     loadSamples(page);
                 }
             });
-
-            const renderPagination = (totalPages, currentPage) => {
-                const paginationDiv = $('#pagination');
-                paginationDiv.empty();
-
-                if (totalPages <= 1) return;
-
-                // Previous Button
-                if (currentPage > 1) {
-                    paginationDiv.append(`<a href="#" class="page-link" data-page="${currentPage - 1}" style="margin: 0 5px;">&laquo; Prev</a>`);
-                }
-
-                // Page Numbers
-                const startPage = Math.max(1, currentPage - 2);
-                const endPage = Math.min(totalPages, currentPage + 2);
-
-                for (let i = startPage; i <= endPage; i++) {
-                    const link = $(`<a href="#" class="page-link" data-page="${i}" style="margin: 0 5px;">${i}</a>`);
-                    if (i === currentPage) {
-                        link.css('font-weight', 'bold');
-                        link.css('text-decoration', 'underline');
-                    }
-                    paginationDiv.append(link);
-                }
-
-                // Next Button
-                if (currentPage < totalPages) {
-                    paginationDiv.append(`<a href="#" class="page-link" data-page="${currentPage + 1}" style="margin: 0 5px;">Next &raquo;</a>`);
-                }
-            };
         });
     </script>
 </body>
