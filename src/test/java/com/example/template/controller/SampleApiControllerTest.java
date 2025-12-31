@@ -50,8 +50,8 @@ class SampleApiControllerTest {
                                 "email", "user1@example.com",
                                 "password", "password123",
                                 "role", "USER",
-                                "created_at", "2025-01-01T12:00:00",
-                                "updated_at", "2025-01-01T12:00:00");
+                                "createdAt", "2025-01-01T12:00:00",
+                                "updatedAt", "2025-01-01T12:00:00");
 
                 PageResponse<Map<String, Object>> response = new PageResponse<>(
                                 List.of(sample1), 1, 10, 1);
@@ -83,8 +83,8 @@ class SampleApiControllerTest {
                                 "email", "user1@example.com",
                                 "password", "password123",
                                 "role", "USER",
-                                "created_at", "2025-01-01T12:00:00",
-                                "updated_at", "2025-01-01T12:00:00");
+                                "createdAt", "2025-01-01T12:00:00",
+                                "updatedAt", "2025-01-01T12:00:00");
                 given(sampleService.getSampleById(id)).willReturn(sample);
 
                 // when & then
@@ -97,8 +97,8 @@ class SampleApiControllerTest {
                                 .andExpect(jsonPath("$.email").value("user1@example.com"))
                                 .andExpect(jsonPath("$.password").value("password123"))
                                 .andExpect(jsonPath("$.role").value("USER"))
-                                .andExpect(jsonPath("$.updated_at").value("2025-01-01T12:00:00"))
-                                .andExpect(jsonPath("$.created_at").value("2025-01-01T12:00:00"));
+                                .andExpect(jsonPath("$.updatedAt").value("2025-01-01T12:00:00"))
+                                .andExpect(jsonPath("$.createdAt").value("2025-01-01T12:00:00"));
         }
 
         @Test
