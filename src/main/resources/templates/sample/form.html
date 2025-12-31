@@ -42,45 +42,44 @@
     </div>
 
     <script>
-        $(document).ready(function () {
-
-            var id = $('#id').val();
+        $(() => {
+            const id = $('#id').val();
 
             if (id) {
                 loadSample(id);
             }
 
             // Function to load sample data for editing
-            function loadSample(id) {
+            const loadSample = (id) => {
                 $.ajax({
-                    url: '/api/samples/' + id,
+                    url: `/api/samples/${id}`,
                     type: 'GET',
-                    success: function (response) {
-                        var data = response.data;
+                    success: (response) => {
+                        const data = response.data;
                         $('#name').val(data.name);
                         $('#email').val(data.email);
                         $('#password').val(data.password);
                         $('#role').val(data.role);
                     },
-                    error: function (xhr) {
+                    error: (xhr) => {
                         App.handleAjaxError(xhr, '데이터 로딩 실패', true);
                     }
                 });
-            }
+            };
 
             // Save Form
-            $('#sampleForm').submit(function (e) {
+            $('#sampleForm').on('submit', (e) => {
                 e.preventDefault();
 
-                var sampleData = {
+                const sampleData = {
                     name: $('#name').val(),
                     email: $('#email').val(),
                     password: $('#password').val(),
                     role: $('#role').val()
                 };
 
-                var url = '/api/samples/';
-                var type = 'POST';
+                let url = '/api/samples/';
+                let type = 'POST';
 
                 if (id) {
                     url += id;
@@ -92,11 +91,11 @@
                     type: type,
                     contentType: 'application/json',
                     data: JSON.stringify(sampleData),
-                    success: function () {
+                    success: () => {
                         alert('저장되었습니다.');
                         window.location.href = '/samples';
                     },
-                    error: function (xhr) {
+                    error: (xhr) => {
                         App.handleAjaxError(xhr, '저장 실패', false);
                     }
                 });

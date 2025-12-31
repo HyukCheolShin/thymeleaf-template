@@ -4,9 +4,11 @@ import com.example.template.mapper.SampleMapper;
 import com.example.template.common.dto.PageRequest;
 import com.example.template.common.dto.PageResponse;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import com.example.template.common.exception.ResourceNotFoundException;
 
 @Service
@@ -51,13 +53,15 @@ public class SampleService {
             throw new IllegalArgumentException("Request body cannot be empty");
         }
 
-        String[] requiredFields = { "name", "email", "password", "role" };
-        for (String field : requiredFields) {
-            Object value = params.get(field);
-            if (value == null || value.toString().trim().isEmpty()) {
-                throw new IllegalArgumentException("Field '" + field + "' is required");
-            }
-        }
+        Stream.of("name", "email", "password", "role")
+                .filter(field -> {
+                    Object value = params.get(field);
+                    return value == null || value.toString().trim().isEmpty();
+                })
+                .findFirst()
+                .ifPresent(field -> {
+                    throw new IllegalArgumentException("Field '" + field + "' is required");
+                });
     }
 
     public void deleteSample(Long id) {

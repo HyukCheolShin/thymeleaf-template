@@ -2,17 +2,17 @@
  * Common JavaScript for Sample Application
  */
 
-var App = {
+const App = {
     /**
      * Initialize CSRF Token for AJAX requests
      */
-    initCsrf: function () {
-        var token = $("meta[name='_csrf']").attr("content");
-        var header = $("meta[name='_csrf_header']").attr("content");
+    initCsrf() {
+        const token = $("meta[name='_csrf']").attr("content");
+        const header = $("meta[name='_csrf_header']").attr("content");
 
         if (token && header) {
             $.ajaxSetup({
-                beforeSend: function (xhr) {
+                beforeSend: (xhr) => {
                     xhr.setRequestHeader(header, token);
                 }
             });
@@ -25,8 +25,8 @@ var App = {
      * @param {String} defaultMsg - Default error message if no detail is found
      * @param {Boolean} goBack - Whether to go back to previous page on error
      */
-    handleAjaxError: function (xhr, defaultMsg, goBack) {
-        var msg = defaultMsg || '오류가 발생했습니다.';
+    handleAjaxError(xhr, defaultMsg, goBack) {
+        let msg = defaultMsg || '오류가 발생했습니다.';
         if (xhr.responseJSON && xhr.responseJSON.message) {
             msg = xhr.responseJSON.message;
         }
@@ -39,6 +39,6 @@ var App = {
 };
 
 // Initialize CSRF on document ready if jQuery is available
-$(document).ready(function () {
+$(() => {
     App.initCsrf();
 });

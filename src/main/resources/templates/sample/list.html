@@ -57,61 +57,16 @@
     </div>
 
     <script>
-        $(document).ready(function () {
+        $(() => {
             // CSRF handled by common.js
 
-            var currentPage = 1;
-            var pageSize = 10;
+            let currentPage = 1;
+            const pageSize = 10;
 
-            loadSamples(currentPage);
-
-            // Search button click
-            $('#btnSearch').click(function () {
-                currentPage = 1;
-                loadSamples();
-            });
-
-            // Enter key in search input
-            $('#keyword').keypress(function (e) {
-                if (e.which == 13) {
-                    $('#btnSearch').click();
-                }
-            });
-
-
-
-            // Delete button click handler
-            $(document).on('click', '.btn-delete', function () {
-                if (!confirm('정말 삭제하시겠습니까?')) return;
-
-                var id = $(this).data('id');
-                $.ajax({
-                    url: '/api/samples/' + id,
-                    type: 'DELETE',
-                    success: function () {
-                        alert('삭제되었습니다.');
-                        loadSamples(currentPage);
-                    },
-                    error: function (xhr) {
-                        App.handleAjaxError(xhr, '삭제 중 오류가 발생했습니다.');
-                    }
-                });
-            });
-
-            // Pagination click handler
-            $(document).on('click', '.page-link', function (e) {
-                e.preventDefault();
-                var page = $(this).data('page');
-                if (page) {
-                    currentPage = page;
-                    loadSamples(page);
-                }
-            });
-
-            function loadSamples(page) {
-                page = page || 1; // Default to page 1 if not provided
-                var keyword = $('#keyword').val();
-                var searchType = $('#searchType').val();
+            // Function to load samples
+            const loadSamples = (page = 1) => {
+                const keyword = $('#keyword').val();
+                const searchType = $('#searchType').val();
 
                 $.ajax({
                     url: '/api/samples/',
@@ -123,16 +78,14 @@
                         searchType: searchType
                     },
                     dataType: 'json',
-                    success: function (response) {
-                        var data = response.data.list;
-                        var totalPages = response.data.totalPages;
-                        var currentPage = response.data.currentPage;
+                    success: (response) => {
+                        const { list, totalPages, currentPage: responsePage } = response.data;
 
-                        var tableBody = $('#sampleTableBody');
+                        const tableBody = $('#sampleTableBody');
                         tableBody.empty();
 
-                        $.each(data, function (index, sample) {
-                            var row = $('<tr>');
+                        $.each(list, (index, sample) => {
+                            const row = $('<tr>');
                             row.data('sample', sample);
 
                             row.append($('<td>').text(sample.id));
@@ -143,40 +96,84 @@
                             row.append($('<td>').text(sample.createdAt));
                             row.append($('<td>').text(sample.updatedAt));
 
-                            var actionTd = $('<td>');
-                            var editBtn = $('<a href="/samples/' + sample.id + '">').text('Edit').addClass('btn btn-sm btn-primary').css('margin-right', '5px');
-                            var deleteBtn = $('<button>').text('Delete').addClass('btn btn-sm btn-danger btn-delete').data('id', sample.id);
+                            const actionTd = $('<td>');
+                            const editBtn = $(`<a href="/samples/${sample.id}">`).text('Edit').addClass('btn btn-sm btn-primary').css('margin-right', '5px');
+                            const deleteBtn = $('<button>').text('Delete').addClass('btn btn-sm btn-danger btn-delete').data('id', sample.id);
                             actionTd.append(editBtn).append(deleteBtn);
                             row.append(actionTd);
 
                             tableBody.append(row);
                         });
 
-                        renderPagination(totalPages, currentPage);
+                        renderPagination(totalPages, responsePage);
                     },
-                    error: function (xhr) {
+                    error: (xhr) => {
                         App.handleAjaxError(xhr, '데이터를 불러오는 중 오류가 발생했습니다.');
                     }
                 });
-            }
+            };
 
-            function renderPagination(totalPages, currentPage) {
-                var paginationDiv = $('#pagination');
+            // Initial load
+            loadSamples(currentPage);
+
+            // Search button click
+            $('#btnSearch').on('click', () => {
+                currentPage = 1;
+                loadSamples();
+            });
+
+            // Enter key in search input
+            $('#keyword').on('keypress', (e) => {
+                if (e.which == 13) {
+                    $('#btnSearch').click();
+                }
+            });
+
+            // Delete button click handler
+            $(document).on('click', '.btn-delete', function () { // Arrow function not used here to preserve 'this' context unless $(this) is replaced
+                if (!confirm('정말 삭제하시겠습니까?')) return;
+
+                const id = $(this).data('id');
+                $.ajax({
+                    url: `/api/samples/${id}`,
+                    type: 'DELETE',
+                    success: () => {
+                        alert('삭제되었습니다.');
+                        loadSamples(currentPage);
+                    },
+                    error: (xhr) => {
+                        App.handleAjaxError(xhr, '삭제 중 오류가 발생했습니다.');
+                    }
+                });
+            });
+
+            // Pagination click handler
+            $(document).on('click', '.page-link', function (e) { // Arrow function not used here to preserve 'this' context
+                e.preventDefault();
+                const page = $(this).data('page');
+                if (page) {
+                    currentPage = page;
+                    loadSamples(page);
+                }
+            });
+
+            const renderPagination = (totalPages, currentPage) => {
+                const paginationDiv = $('#pagination');
                 paginationDiv.empty();
 
                 if (totalPages <= 1) return;
 
                 // Previous Button
                 if (currentPage > 1) {
-                    paginationDiv.append('<a href="#" class="page-link" data-page="' + (currentPage - 1) + '" style="margin: 0 5px;">&laquo; Prev</a>');
+                    paginationDiv.append(`<a href="#" class="page-link" data-page="${currentPage - 1}" style="margin: 0 5px;">&laquo; Prev</a>`);
                 }
 
                 // Page Numbers
-                var startPage = Math.max(1, currentPage - 2);
-                var endPage = Math.min(totalPages, currentPage + 2);
+                const startPage = Math.max(1, currentPage - 2);
+                const endPage = Math.min(totalPages, currentPage + 2);
 
-                for (var i = startPage; i <= endPage; i++) {
-                    var link = $('<a href="#" class="page-link" data-page="' + i + '" style="margin: 0 5px;">' + i + '</a>');
+                for (let i = startPage; i <= endPage; i++) {
+                    const link = $(`<a href="#" class="page-link" data-page="${i}" style="margin: 0 5px;">${i}</a>`);
                     if (i === currentPage) {
                         link.css('font-weight', 'bold');
                         link.css('text-decoration', 'underline');
@@ -186,9 +183,9 @@
 
                 // Next Button
                 if (currentPage < totalPages) {
-                    paginationDiv.append('<a href="#" class="page-link" data-page="' + (currentPage + 1) + '" style="margin: 0 5px;">Next &raquo;</a>');
+                    paginationDiv.append(`<a href="#" class="page-link" data-page="${currentPage + 1}" style="margin: 0 5px;">Next &raquo;</a>`);
                 }
-            }
+            };
         });
     </script>
 </body>
