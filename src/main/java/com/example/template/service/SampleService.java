@@ -11,13 +11,18 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import com.example.template.common.exception.ResourceNotFoundException;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.HashMap;
+
 @Service
 public class SampleService {
 
     private final SampleMapper sampleMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public SampleService(SampleMapper sampleMapper) {
+    public SampleService(SampleMapper sampleMapper, PasswordEncoder passwordEncoder) {
         this.sampleMapper = sampleMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public PageResponse<Map<String, Object>> getAllSamples(PageRequest pageRequest) {
@@ -40,12 +45,22 @@ public class SampleService {
 
     public void saveSample(Map<String, Object> params) {
         validate(params);
-        sampleMapper.insert(params);
+
+        Map<String, Object> mutableParams = new HashMap<>(params);
+        String rawPassword = (String) mutableParams.get("password");
+        mutableParams.put("password", passwordEncoder.encode(rawPassword));
+
+        sampleMapper.insert(mutableParams);
     }
 
     public void updateSample(Map<String, Object> params) {
         validate(params);
-        sampleMapper.update(params);
+
+        Map<String, Object> mutableParams = new HashMap<>(params);
+        String rawPassword = (String) mutableParams.get("password");
+        mutableParams.put("password", passwordEncoder.encode(rawPassword));
+
+        sampleMapper.update(mutableParams);
     }
 
     private void validate(Map<String, Object> params) {

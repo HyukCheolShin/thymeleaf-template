@@ -9,6 +9,7 @@ spring:
   jackson:
     time-zone: Asia/Seoul
 
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   configuration:

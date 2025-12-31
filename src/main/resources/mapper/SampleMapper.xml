@@ -67,4 +67,8 @@
         DELETE FROM sample WHERE id = #{id}
     </delete>
 
+    <select id="findByEmail" parameterType="string" resultType="com.example.template.common.map.CamelCaseMap">
+        SELECT id, email, password, name, role FROM sample WHERE email = #{email}
+    </select>
+
 </mapper>

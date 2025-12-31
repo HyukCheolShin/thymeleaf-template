@@ -1,36 +1,106 @@
-# Thymeleaf Template Project
+# Thymeleaf Template Project Guide
 
-Spring Boot와 Thymeleaf를 기반으로 구축된 템플릿 프로젝트입니다. 기본적인 CRUD 기능과 페이지네이션, 그리고 실무에서 유용한 MyBatis 설정들이 적용되어 있습니다.
+본 문서는 **AIA생명 AA(Application Architecture)**팀에서 제공하는 **Spring Boot 웹 애플리케이션 표준 템플릿** 가이드입니다.
+프로젝트에 참여하는 모든 개발자는 본 가이드를 숙지하고 개발 표준을 준수해 주시기 바랍니다.
 
-## 주요 구현 내용
+---
 
-### 1. 게시판 CRUD 및 페이지네이션
-- **목록 조회**: 페이징 처리된 샘플 데이터 목록을 조회합니다.
-- **상세/등록/수정/삭제**: 기본적인 데이터 조작 기능을 제공합니다.
-- **Frontend**: Thymeleaf와 jQuery(AJAX)를 사용하여 비동기 데이터 로딩 및 동적 페이지네이션 컨트롤을 구현했습니다.
+## 1. 개요 (Overview)
+이 프로젝트는 Spring Boot, Thymeleaf, MyBatis를 기반으로 구성된 웹 애플리케이션 템플릿입니다.
+최신 Java 생태계(JDK 21)와 모던 프론트엔드 패턴(ES6+)을 적용하여 생산성과 유지보수성을 극대화하도록 설계되었습니다.
 
-### 2. 백엔드 아키텍처 개선
-- **공통 페이지네이션 DTO**: `PageRequest`와 `PageResponse` 클래스를 도입하여 페이징 요청과 응답을 표준화했습니다.
-- **Service 계층 리팩토링**: `Map` 기반의 파라미터 전달 방식을 개선하고, 비즈니스 로직을 명확히 분리했습니다.
+## 2. 기술 스택 (Tech Stack)
 
-### 3. 데이터 매핑 전략 (CamelCaseMap)
-- **Map 결과 자동 변환**: MyBatis `resultType="map"` 사용 시, DB의 Snake Case 컬럼명(`created_at`)을 Java의 Camel Case(`createdAt`)로 자동 변환해주는 `CamelCaseMap`을 구현했습니다.
-- **MyBatis 설정**: `call-setters-on-nulls: true`를 적용하여 NULL 값이 있는 컬럼도 Map 결과에 누락되지 않도록 설정했습니다.
-- **명시적 컬럼 조회**: `SELECT *` 대신 필요한 컬럼을 명시적으로 나열하여 유지보수성과 성능을 고려했습니다.
+| 구분 | 기술 | 버전 | 비고 |
+| :--- | :--- | :--- | :--- |
+| **Language** | Java | **21** | LTS 버전 |
+| **Framework** | Spring Boot | 3.5.9 | Spring Security 6 포함 |
+| **ORM** | MyBatis | 3.0.5 | PostgreSQL 연동 |
+| **DB** | PostgreSQL | - | |
+| **Template Engine** | Thymeleaf | - | Server-side Rendering |
+| **Frontend** | jQuery, Bootstrap | 3.7.1, 5.x | **ES6+ 문법 필수** |
+| **Build Tool** | Maven | - | |
 
-### 4. 테스트 코드
-- **SampleApiControllerTest**: API 엔드포인트에 대한 통합 테스트를 작성하여, 변경 사항(DTO 도입, 키명 변경 등) 발생 시 기능이 정상 동작함을 지속적으로 검증했습니다.
+## 3. 핵심 아키텍처 및 설정 (Architecture & Config)
 
-## 기술 스택
-- **Java**: 21
-- **Spring Boot**: 3.x
-- **Database**: PostgreSQL
-- **Persistence**: MyBatis
-- **Template Engine**: Thymeleaf
-- **Frontend**: jQuery, HTML/CSS
+### 3.1. Layered Architecture
+표준적인 계층형 아키텍처를 따릅니다.
+- **Controller** (`com.example.template.controller`): 웹 요청 처리 및 뷰 반환.
+- **Service** (`com.example.template.service`): 비즈니스 로직 및 트랜잭션 관리.
+- **Mapper** (`com.example.template.mapper`): SQL 매핑 및 DB 접근 (MyBatis).
+- **Common** (`com.example.template.common`): 전역 예외 처리, 유틸리티, 설정 등.
 
-## 실행 방법
-```bash
-./mvnw spring-boot:run
+### 3.2. Security Configuration (`SecurityConfig.java`)
+- **Authentication**: `CustomUserDetailsService`를 통해 DB(`sample` 테이블) 기반 인증을 수행합니다.
+- **Password Encoding**: `BCryptPasswordEncoder`를 사용하여 비밀번호를 안전하게 암호화합니다.
+- **Login/Logout**:
+    - 로그인 페이지: `/login` (커스텀 디자인 적용)
+    - 로그아웃: `/logout` (세션 무효화)
+    - 루트 경로(`/`) 접속 시 로그인 여부에 따라 `/samples` 또는 `/login`으로 리다이렉트됩니다.
+- **Access Control**: `/api/**`, `/samples/**` 등 주요 비즈니스 로직은 인증된 사용자만 접근 가능합니다.
+
+### 3.3. Logging (`LoggingInterceptor.java`)
+- `WebMvcConfig`에 등록된 인터셉터를 통해 모든 HTTP 요청의 처리 시간을 측정하고 로깅합니다.
+- **Log Pattern**: `[REQUEST] [METHOD] URL Duration`
+
+## 4. 개발 표준 가이드 (Development Standards)
+
+### 4.1. Java (Backend)
+- **Stream API 사용**: 반복문이나 컬렉션 처리 시 가독성을 위해 Stream API 사용을 권장합니다.
+- **타입 명시**: `var` 키워드 사용을 지양하고, 명시적인 타입(`Map<String, Object>` 등)을 선언하여 가독성을 높입니다.
+- **Map 기반 DTO**: 유연한 데이터 처리를 위해 `Map` 및 `CamelCaseMap`을 적극 활용하되, 필요한 경우 명시적 DTO 클래스를 생성합니다.
+
+```java
+// Good Example (SampleService.java)
+Stream.of("name", "email").filter(...).findFirst().ifPresent(...);
 ```
-접속: `http://localhost:8080/sample/list`
+
+### 4.2. JavaScript (Frontend)
+- **ES6+ 문법 필수**: `var` 대신 `const`, `let`을 사용하고, `Arrow Function`(`=>`)을 사용합니다.
+- **함수 정의 순서 (중요)**: `const`로 선언된 함수는 호이스팅(Hoisting)되지 않으므로, **반드시 호출하기 전에 정의**해야 합니다. (TDZ 방지)
+- **Template Literals**: 문자열 연결 시 `+` 연산자 대신 백틱(`` ` ``)을 사용합니다.
+
+```javascript
+/* Good Example */
+$(() => {
+    // 1. 함수 정의
+    const loadData = () => { ... };
+
+    // 2. 로직 실행 (정의 이후 호출)
+    loadData(); 
+});
+```
+
+## 5. 주요 폴더 구조 (Directory Structure)
+
+```
+src/main/
+├── java/com/example/template/
+│   ├── common/             # 공통 모듈 (Exception, Interceptor, Utopia)
+│   ├── config/             # Spring 설정 (Security, WebMvc 등)
+│   ├── controller/         # Web Controller
+│   ├── mapper/             # MyBatis Client Interface
+│   └── service/            # Business Logic
+└── resources/
+    ├── mapper/             # MyBatis XML Files
+    ├── static/             # JS, CSS, Images
+    ├── templates/          # Thymeleaf HTML
+    └── application.yaml    # Application Configuration
+```
+
+## 6. 시작하기 (Getting Started)
+
+1. **DB 설정**: `src/main/resources/application.yaml` 파일에서 PostgreSQL 접속 정보를 본인 환경에 맞게 수정합니다.
+2. **데이터 초기화**: `src/main/resources/sql/sample.sql` 스크립트를 실행하여 테이블 생성 및 기초 데이터를 적재합니다.
+3. **빌드**: 프로젝트 루트에서 다음 명령어를 실행합니다.
+   ```bash
+   ./mvnw clean package
+   ```
+3. **실행**:
+   ```bash
+   java -jar target/thymeleaf-template-0.0.1-SNAPSHOT.jar
+   ```
+4. **접속**: 브라우저에서 `http://localhost:8080/samples` 접속.
+
+---
+**Written by Application Architect**

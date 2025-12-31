@@ -17,4 +17,6 @@ public interface SampleMapper {
     void update(Map<String, Object> params);
 
     void delete(Long id);
+
+    Map<String, Object> findByEmail(String email);
 }
