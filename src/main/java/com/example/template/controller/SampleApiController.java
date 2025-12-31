@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
+import com.example.template.common.dto.PageRequest;
+import com.example.template.common.dto.PageResponse;
+
 import java.util.Map;
 
 @RestController
@@ -24,8 +27,10 @@ public class SampleApiController {
     }
 
     @GetMapping("/")
-    public List<Map<String, Object>> getAllSamples() {
-        return sampleService.getAllSamples();
+    public PageResponse<Map<String, Object>> getAllSamples(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return sampleService.getAllSamples(new PageRequest(page, size));
     }
 
     @GetMapping("/{id}")

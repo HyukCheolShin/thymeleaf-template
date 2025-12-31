@@ -47,6 +47,10 @@
         </tbody>
     </table>
 
+    <!-- Pagination Controls -->
+    <div id="pagination" style="margin-top: 20px; text-align: center;">
+    </div>
+
     <script>
         $(document).ready(function () {
             var token = $("meta[name='_csrf']").attr("content");
@@ -58,7 +62,10 @@
                 }
             });
 
-            loadSamples();
+            var currentPage = 1;
+            var pageSize = 10;
+
+            loadSamples(currentPage);
 
             $('#btnSave').click(function () {
                 var id = $('#id').val();
@@ -85,7 +92,7 @@
                     success: function () {
                         alert('저장되었습니다.');
                         resetForm();
-                        loadSamples();
+                        loadSamples(currentPage);
                     },
                     error: function (xhr, status, error) {
                         console.error("Error saving sample:", error);
@@ -132,7 +139,7 @@
                     type: 'DELETE',
                     success: function () {
                         alert('삭제되었습니다.');
-                        loadSamples();
+                        loadSamples(currentPage);
                     },
                     error: function (xhr, status, error) {
                         console.error("Error deleting sample:", error);
@@ -141,18 +148,36 @@
                 });
             });
 
-            function loadSamples() {
+            // Pagination click handler
+            $(document).on('click', '.page-link', function (e) {
+                e.preventDefault();
+                var page = $(this).data('page');
+                if (page) {
+                    currentPage = page;
+                    loadSamples(page);
+                }
+            });
+
+            function loadSamples(page) {
                 $.ajax({
                     url: '/api/samples/',
                     type: 'GET',
+                    data: {
+                        page: page,
+                        size: pageSize
+                    },
                     dataType: 'json',
-                    success: function (data) {
+                    success: function (response) {
+                        var data = response.list;
+                        var totalPages = response.totalPages;
+                        var currentPage = response.currentPage;
+
                         var tableBody = $('#sampleTableBody');
                         tableBody.empty();
 
                         $.each(data, function (index, sample) {
                             var row = $('<tr>');
-                            row.data('sample', sample); // Store sample data in row
+                            row.data('sample', sample);
 
                             row.append($('<td>').text(sample.id));
                             row.append($('<td>').text(sample.email));
@@ -162,7 +187,6 @@
                             row.append($('<td>').text(sample.created_at));
                             row.append($('<td>').text(sample.updated_at));
 
-                            // Action column
                             var actionTd = $('<td>');
                             var editBtn = $('<button>').text('Edit').addClass('btn-edit').css('margin-right', '5px');
                             var deleteBtn = $('<button>').text('Delete').addClass('btn-delete').data('id', sample.id);
@@ -171,12 +195,44 @@
 
                             tableBody.append(row);
                         });
+
+                        renderPagination(totalPages, currentPage);
                     },
                     error: function (xhr, status, error) {
                         console.error("Error fetching samples:", error);
                         alert("데이터를 불러오는 중 오류가 발생했습니다.");
                     }
                 });
+            }
+
+            function renderPagination(totalPages, currentPage) {
+                var paginationDiv = $('#pagination');
+                paginationDiv.empty();
+
+                if (totalPages <= 1) return;
+
+                // Previous Button
+                if (currentPage > 1) {
+                    paginationDiv.append('<a href="#" class="page-link" data-page="' + (currentPage - 1) + '" style="margin: 0 5px;">&laquo; Prev</a>');
+                }
+
+                // Page Numbers
+                var startPage = Math.max(1, currentPage - 2);
+                var endPage = Math.min(totalPages, currentPage + 2);
+
+                for (var i = startPage; i <= endPage; i++) {
+                    var link = $('<a href="#" class="page-link" data-page="' + i + '" style="margin: 0 5px;">' + i + '</a>');
+                    if (i === currentPage) {
+                        link.css('font-weight', 'bold');
+                        link.css('text-decoration', 'underline');
+                    }
+                    paginationDiv.append(link);
+                }
+
+                // Next Button
+                if (currentPage < totalPages) {
+                    paginationDiv.append('<a href="#" class="page-link" data-page="' + (currentPage + 1) + '" style="margin: 0 5px;">Next &raquo;</a>');
+                }
             }
         });
     </script>

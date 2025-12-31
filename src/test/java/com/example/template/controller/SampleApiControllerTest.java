@@ -8,8 +8,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
 import org.springframework.security.test.context.support.WithMockUser;
 
+import com.example.template.common.dto.PageRequest;
+import com.example.template.common.dto.PageResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(SampleApiController.class)
 @WithMockUser
+@SuppressWarnings("null")
 class SampleApiControllerTest {
 
         @Autowired
@@ -48,20 +52,24 @@ class SampleApiControllerTest {
                                 "role", "USER",
                                 "created_at", "2025-01-01T12:00:00",
                                 "updated_at", "2025-01-01T12:00:00");
-                given(sampleService.getAllSamples()).willReturn(List.of(sample1));
+
+                PageResponse<Map<String, Object>> response = new PageResponse<>(
+                                List.of(sample1), 1, 10, 1);
+
+                given(sampleService.getAllSamples(any(PageRequest.class))).willReturn(response);
 
                 // when & then
                 mockMvc.perform(get("/api/samples/")
-                                .accept(MediaType.APPLICATION_JSON))
+                                .param("page", "1")
+                                .param("size", "10")
+                                .accept(MediaType.APPLICATION_JSON_VALUE))
                                 .andExpect(status().isOk())
-                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(jsonPath("$[0].id").value(1))
-                                .andExpect(jsonPath("$[0].name").value("홍길동"))
-                                .andExpect(jsonPath("$[0].email").value("user1@example.com"))
-                                .andExpect(jsonPath("$[0].password").value("password123"))
-                                .andExpect(jsonPath("$[0].role").value("USER"))
-                                .andExpect(jsonPath("$[0].updated_at").value("2025-01-01T12:00:00"))
-                                .andExpect(jsonPath("$[0].created_at").value("2025-01-01T12:00:00"));
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                                .andExpect(jsonPath("$.list[0].id").value(1))
+                                .andExpect(jsonPath("$.list[0].name").value("홍길동"))
+                                .andExpect(jsonPath("$.totalItems").value(1))
+                                .andExpect(jsonPath("$.totalPages").value(1))
+                                .andExpect(jsonPath("$.currentPage").value(1));
         }
 
         @Test
@@ -81,9 +89,9 @@ class SampleApiControllerTest {
 
                 // when & then
                 mockMvc.perform(get("/api/samples/{id}", id)
-                                .accept(MediaType.APPLICATION_JSON))
+                                .accept(MediaType.APPLICATION_JSON_VALUE))
                                 .andExpect(status().isOk())
-                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                                 .andExpect(jsonPath("$.id").value(1))
                                 .andExpect(jsonPath("$.name").value("홍길동"))
                                 .andExpect(jsonPath("$.email").value("user1@example.com"))
@@ -101,8 +109,9 @@ class SampleApiControllerTest {
 
                 // when & then
                 mockMvc.perform(post("/api/samples/")
-                                .with(csrf()) // Spring Security testing usually requires CSRF token for POST
-                                .contentType(MediaType.APPLICATION_JSON)
+                                .with(csrf()) // Spring Security testing usually requires CSRF
+                                              // token for POST
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(
                                                 "{\"email\":\"newuser@example.com\",\"password\":\"newpassword\",\"name\":\"New User\",\"role\":\"USER\"}"))
                                 .andExpect(status().isOk());
@@ -116,7 +125,7 @@ class SampleApiControllerTest {
                 // when & then
                 mockMvc.perform(put("/api/samples/1")
                                 .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content("{\"email\":\"updated@example.com\",\"password\":\"newpassword\",\"name\":\"Updated User\",\"role\":\"ADMIN\"}"))
                                 .andExpect(status().isOk());
 
