@@ -73,6 +73,37 @@ class SampleApiControllerTest {
         }
 
         @Test
+        @DisplayName("샘플 검색 성공")
+        void searchSamples() throws Exception {
+                // given
+                Map<String, Object> sample1 = Map.of(
+                                "id", 1L,
+                                "name", "홍길동",
+                                "email", "user1@example.com",
+                                "password", "password123",
+                                "role", "USER",
+                                "createdAt", "2025-01-01T12:00:00",
+                                "updatedAt", "2025-01-01T12:00:00");
+
+                PageResponse<Map<String, Object>> response = new PageResponse<>(
+                                List.of(sample1), 1, 10, 1);
+
+                given(sampleService.getAllSamples(any(PageRequest.class))).willReturn(response);
+
+                // when & then
+                mockMvc.perform(get("/api/samples/")
+                                .param("page", "1")
+                                .param("size", "10")
+                                .param("keyword", "홍길동")
+                                .param("searchType", "name")
+                                .accept(MediaType.APPLICATION_JSON_VALUE))
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                                .andExpect(jsonPath("$.list[0].id").value(1))
+                                .andExpect(jsonPath("$.list[0].name").value("홍길동"));
+        }
+
+        @Test
         @DisplayName("ID로 샘플 조회 성공")
         void getSampleById() throws Exception {
                 // given

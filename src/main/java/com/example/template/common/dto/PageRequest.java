@@ -8,15 +8,28 @@ import lombok.Setter;
 public class PageRequest {
     private int page;
     private int size;
+    private String keyword;
+    private String searchType;
 
     public PageRequest() {
         this.page = 1;
         this.size = 10;
+        this.keyword = "";
+        this.searchType = "";
     }
 
     public PageRequest(int page, int size) {
         this.page = page <= 0 ? 1 : page;
         this.size = size <= 0 ? 10 : size;
+        this.keyword = "";
+        this.searchType = "";
+    }
+
+    public PageRequest(int page, int size, String keyword, String searchType) {
+        this.page = page <= 0 ? 1 : page;
+        this.size = size <= 0 ? 10 : size;
+        this.keyword = keyword == null ? "" : keyword;
+        this.searchType = searchType == null ? "" : searchType;
     }
 
     public int getOffset() {

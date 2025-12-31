@@ -4,6 +4,21 @@
 
     <select id="findAll" parameterType="map" resultType="com.example.template.common.map.CamelCaseMap">
         SELECT id, email, password, name, role, created_at, updated_at FROM sample
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="searchType == 'name'">
+                        AND name LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="searchType == 'email'">
+                        AND email LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="searchType == 'all'">
+                         AND (name LIKE CONCAT('%', #{keyword}, '%') OR email LIKE CONCAT('%', #{keyword}, '%'))
+                    </when>
+                </choose>
+            </if>
+        </where>
         ORDER BY id DESC
         <if test="limit != null and offset != null">
             LIMIT #{limit} OFFSET #{offset}
@@ -12,6 +27,21 @@
 
     <select id="count" parameterType="map" resultType="int">
         SELECT count(*) FROM sample
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="searchType == 'name'">
+                        AND name LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="searchType == 'email'">
+                        AND email LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="searchType == 'all'">
+                         AND (name LIKE CONCAT('%', #{keyword}, '%') OR email LIKE CONCAT('%', #{keyword}, '%'))
+                    </when>
+                </choose>
+            </if>
+        </where>
     </select>
 
     <select id="findById" parameterType="long" resultType="com.example.template.common.map.CamelCaseMap">

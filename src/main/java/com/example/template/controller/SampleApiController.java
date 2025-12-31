@@ -29,8 +29,10 @@ public class SampleApiController {
     @GetMapping("/")
     public PageResponse<Map<String, Object>> getAllSamples(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return sampleService.getAllSamples(new PageRequest(page, size));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "") String searchType) {
+        return sampleService.getAllSamples(new PageRequest(page, size, keyword, searchType));
     }
 
     @GetMapping("/{id}")

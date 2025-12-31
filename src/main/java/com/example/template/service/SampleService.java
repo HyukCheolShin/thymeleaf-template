@@ -17,7 +17,11 @@ public class SampleService {
     }
 
     public PageResponse<Map<String, Object>> getAllSamples(PageRequest pageRequest) {
-        Map<String, Object> params = Map.of("limit", pageRequest.getSize(), "offset", pageRequest.getOffset());
+        Map<String, Object> params = Map.of(
+                "limit", pageRequest.getSize(),
+                "offset", pageRequest.getOffset(),
+                "keyword", pageRequest.getKeyword(),
+                "searchType", pageRequest.getSearchType());
 
         int totalItems = sampleMapper.count(params);
         List<Map<String, Object>> list = sampleMapper.findAll(params);
