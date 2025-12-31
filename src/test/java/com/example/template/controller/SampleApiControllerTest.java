@@ -65,11 +65,12 @@ class SampleApiControllerTest {
                                 .accept(MediaType.APPLICATION_JSON_VALUE))
                                 .andExpect(status().isOk())
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                                .andExpect(jsonPath("$.list[0].id").value(1))
-                                .andExpect(jsonPath("$.list[0].name").value("홍길동"))
-                                .andExpect(jsonPath("$.totalItems").value(1))
-                                .andExpect(jsonPath("$.totalPages").value(1))
-                                .andExpect(jsonPath("$.currentPage").value(1));
+                                .andExpect(jsonPath("$.code").value("SUCCESS")) // Check response code
+                                .andExpect(jsonPath("$.data.list[0].id").value(1))
+                                .andExpect(jsonPath("$.data.list[0].name").value("홍길동"))
+                                .andExpect(jsonPath("$.data.totalItems").value(1))
+                                .andExpect(jsonPath("$.data.totalPages").value(1))
+                                .andExpect(jsonPath("$.data.currentPage").value(1));
         }
 
         @Test
@@ -99,8 +100,9 @@ class SampleApiControllerTest {
                                 .accept(MediaType.APPLICATION_JSON_VALUE))
                                 .andExpect(status().isOk())
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                                .andExpect(jsonPath("$.list[0].id").value(1))
-                                .andExpect(jsonPath("$.list[0].name").value("홍길동"));
+                                .andExpect(jsonPath("$.code").value("SUCCESS")) // Check response code
+                                .andExpect(jsonPath("$.data.list[0].id").value(1))
+                                .andExpect(jsonPath("$.data.list[0].name").value("홍길동"));
         }
 
         @Test
@@ -123,13 +125,14 @@ class SampleApiControllerTest {
                                 .accept(MediaType.APPLICATION_JSON_VALUE))
                                 .andExpect(status().isOk())
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                                .andExpect(jsonPath("$.id").value(1))
-                                .andExpect(jsonPath("$.name").value("홍길동"))
-                                .andExpect(jsonPath("$.email").value("user1@example.com"))
-                                .andExpect(jsonPath("$.password").value("password123"))
-                                .andExpect(jsonPath("$.role").value("USER"))
-                                .andExpect(jsonPath("$.updatedAt").value("2025-01-01T12:00:00"))
-                                .andExpect(jsonPath("$.createdAt").value("2025-01-01T12:00:00"));
+                                .andExpect(jsonPath("$.code").value("SUCCESS")) // Check response code
+                                .andExpect(jsonPath("$.data.id").value(1))
+                                .andExpect(jsonPath("$.data.name").value("홍길동"))
+                                .andExpect(jsonPath("$.data.email").value("user1@example.com"))
+                                .andExpect(jsonPath("$.data.password").value("password123"))
+                                .andExpect(jsonPath("$.data.role").value("USER"))
+                                .andExpect(jsonPath("$.data.updatedAt").value("2025-01-01T12:00:00"))
+                                .andExpect(jsonPath("$.data.createdAt").value("2025-01-01T12:00:00"));
         }
 
         @Test
@@ -172,5 +175,34 @@ class SampleApiControllerTest {
                                 .andExpect(status().isOk());
 
                 verify(sampleService).deleteSample(eq(1L));
+        }
+
+        @Test
+        @DisplayName("예외 발생 시 GlobalExceptionHandler 동작 확인 (ResourceNotFound)")
+        void handleExceptionTest() throws Exception {
+                // given
+                given(sampleService.getSampleById(999L))
+                                .willThrow(new com.example.template.common.exception.ResourceNotFoundException(
+                                                "Sample not found"));
+
+                // when & then
+                mockMvc.perform(get("/api/samples/999")
+                                .accept(MediaType.APPLICATION_JSON_VALUE))
+                                .andExpect(status().isNotFound())
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                                .andExpect(jsonPath("$.code").value("NOT_FOUND"))
+                                .andExpect(jsonPath("$.message").value("Sample not found"));
+        }
+
+        @Test
+        @DisplayName("잘못된 ID 형식 요청 시 400 에러 반환")
+        void handleTypeMismatchTest() throws Exception {
+                // when & then
+                mockMvc.perform(get("/api/samples/invalid-id")
+                                .accept(MediaType.APPLICATION_JSON_VALUE))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                                .andExpect(jsonPath("$.code").value("BAD_REQUEST"))
+                                .andExpect(jsonPath("$.message").value("Invalid value for parameter: id"));
         }
 }

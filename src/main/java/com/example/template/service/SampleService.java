@@ -6,6 +6,8 @@ import com.example.template.common.dto.PageResponse;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import com.example.template.common.exception.ResourceNotFoundException;
 
 @Service
 public class SampleService {
@@ -30,7 +32,8 @@ public class SampleService {
     }
 
     public Map<String, Object> getSampleById(Long id) {
-        return sampleMapper.findById(id);
+        return Optional.ofNullable(sampleMapper.findById(id))
+                .orElseThrow(() -> new ResourceNotFoundException("Sample not found with id: " + id));
     }
 
     public void saveSample(Map<String, Object> params) {

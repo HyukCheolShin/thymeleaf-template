@@ -131,9 +131,9 @@
                     },
                     dataType: 'json',
                     success: function (response) {
-                        var data = response.list;
-                        var totalPages = response.totalPages;
-                        var currentPage = response.currentPage;
+                        var data = response.data.list;
+                        var totalPages = response.data.totalPages;
+                        var currentPage = response.data.currentPage;
 
                         var tableBody = $('#sampleTableBody');
                         tableBody.empty();

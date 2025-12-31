@@ -56,7 +56,8 @@
                 $.ajax({
                     url: '/api/samples/' + id,
                     type: 'GET',
-                    success: function (data) {
+                    success: function (response) {
+                        var data = response.data;
                         $('#name').val(data.name);
                         $('#email').val(data.email);
                         $('#password').val(data.password);

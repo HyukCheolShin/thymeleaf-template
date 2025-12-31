@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.template.common.dto.ApiResponse;
 import com.example.template.common.dto.PageRequest;
 import com.example.template.common.dto.PageResponse;
 
@@ -27,32 +28,35 @@ public class SampleApiController {
     }
 
     @GetMapping("/")
-    public PageResponse<Map<String, Object>> getAllSamples(
+    public ApiResponse<PageResponse<Map<String, Object>>> getAllSamples(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "") String searchType) {
-        return sampleService.getAllSamples(new PageRequest(page, size, keyword, searchType));
+        return ApiResponse.success(sampleService.getAllSamples(new PageRequest(page, size, keyword, searchType)));
     }
 
     @GetMapping("/{id}")
-    public Map<String, Object> getSampleById(@PathVariable Long id) {
-        return sampleService.getSampleById(id);
+    public ApiResponse<Map<String, Object>> getSampleById(@PathVariable Long id) {
+        return ApiResponse.success(sampleService.getSampleById(id));
     }
 
     @PostMapping("/")
-    public void saveSample(@RequestBody Map<String, Object> params) {
+    public ApiResponse<Void> saveSample(@RequestBody Map<String, Object> params) {
         sampleService.saveSample(params);
+        return ApiResponse.success();
     }
 
     @PutMapping("/{id}")
-    public void updateSample(@PathVariable Long id, @RequestBody Map<String, Object> params) {
+    public ApiResponse<Void> updateSample(@PathVariable Long id, @RequestBody Map<String, Object> params) {
         params.put("id", id);
         sampleService.updateSample(params);
+        return ApiResponse.success();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteSample(@PathVariable Long id) {
+    public ApiResponse<Void> deleteSample(@PathVariable Long id) {
         sampleService.deleteSample(id);
+        return ApiResponse.success();
     }
 }
