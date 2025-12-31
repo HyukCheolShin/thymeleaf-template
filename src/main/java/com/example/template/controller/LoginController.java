@@ -9,17 +9,12 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 @Controller
 public class LoginController {
 
-    @GetMapping("/")
+    @GetMapping({ "/", "/login" })
     public String index(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken)) {
             return "redirect:/samples";
         }
-        return "redirect:/login";
-    }
-
-    @GetMapping("/login")
-    public String login() {
         return "login";
     }
 }
