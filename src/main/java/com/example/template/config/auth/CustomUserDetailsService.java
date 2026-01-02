@@ -1,6 +1,6 @@
 package com.example.template.config.auth;
 
-import com.example.template.mapper.SampleMapper;
+import com.example.template.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -16,11 +16,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final SampleMapper sampleMapper;
+    private final UserMapper userMapper;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Map<String, Object> userMap = sampleMapper.findByEmail(email);
+        Map<String, Object> userMap = userMapper.findByEmail(email);
 
         if (userMap == null) {
             throw new UsernameNotFoundException("User not found with email: " + email);

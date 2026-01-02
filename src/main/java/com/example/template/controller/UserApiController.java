@@ -1,6 +1,6 @@
 package com.example.template.controller;
 
-import com.example.template.service.SampleService;
+import com.example.template.service.UserService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,45 +18,45 @@ import com.example.template.common.dto.PageResponse;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/samples")
-public class SampleApiController {
+@RequestMapping("/api/users")
+public class UserApiController {
 
-    private final SampleService sampleService;
+    private final UserService userService;
 
-    public SampleApiController(SampleService sampleService) {
-        this.sampleService = sampleService;
+    public UserApiController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/")
-    public ApiResponse<PageResponse<Map<String, Object>>> getAllSamples(
+    public ApiResponse<PageResponse<Map<String, Object>>> getAllUsers(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "") String searchType) {
-        return ApiResponse.success(sampleService.getAllSamples(new PageRequest(page, size, keyword, searchType)));
+        return ApiResponse.success(userService.getAllUsers(new PageRequest(page, size, keyword, searchType)));
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<Map<String, Object>> getSampleById(@PathVariable Long id) {
-        return ApiResponse.success(sampleService.getSampleById(id));
+    public ApiResponse<Map<String, Object>> getUserById(@PathVariable Long id) {
+        return ApiResponse.success(userService.getUserById(id));
     }
 
     @PostMapping("/")
-    public ApiResponse<Void> saveSample(@RequestBody Map<String, Object> params) {
-        sampleService.saveSample(params);
+    public ApiResponse<Void> saveUser(@RequestBody Map<String, Object> params) {
+        userService.saveUser(params);
         return ApiResponse.success();
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Void> updateSample(@PathVariable Long id, @RequestBody Map<String, Object> params) {
+    public ApiResponse<Void> updateUser(@PathVariable Long id, @RequestBody Map<String, Object> params) {
         params.put("id", id);
-        sampleService.updateSample(params);
+        userService.updateUser(params);
         return ApiResponse.success();
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> deleteSample(@PathVariable Long id) {
-        sampleService.deleteSample(id);
+    public ApiResponse<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
         return ApiResponse.success();
     }
 }

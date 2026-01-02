@@ -13,7 +13,7 @@ public class LoginController {
     public String index(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken)) {
-            return "redirect:/samples";
+            return "redirect:/users";
         }
         return "login";
     }

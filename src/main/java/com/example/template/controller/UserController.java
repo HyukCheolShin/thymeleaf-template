@@ -10,22 +10,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * 화면 이동을 담당하는 컨트롤러
  */
 @Controller
-@RequestMapping("/samples")
-public class SampleController {
+@RequestMapping("/users")
+public class UserController {
 
     @GetMapping("")
     public String list() {
-        return "sample/list";
+        return "user/list";
     }
 
     @GetMapping("/form")
     public String form() {
-        return "sample/form";
+        return "user/form";
     }
 
     @GetMapping("/{id}")
     public String form(@PathVariable Long id, Model model) {
         model.addAttribute("id", id);
-        return "sample/form";
+        return "user/form";
     }
 }

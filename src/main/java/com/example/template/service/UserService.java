@@ -1,6 +1,6 @@
 package com.example.template.service;
 
-import com.example.template.mapper.SampleMapper;
+import com.example.template.mapper.UserMapper;
 import com.example.template.common.dto.PageRequest;
 import com.example.template.common.dto.PageResponse;
 import org.springframework.stereotype.Service;
@@ -15,52 +15,52 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.HashMap;
 
 @Service
-public class SampleService {
+public class UserService {
 
-    private final SampleMapper sampleMapper;
+    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public SampleService(SampleMapper sampleMapper, PasswordEncoder passwordEncoder) {
-        this.sampleMapper = sampleMapper;
+    public UserService(UserMapper userMapper, PasswordEncoder passwordEncoder) {
+        this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public PageResponse<Map<String, Object>> getAllSamples(PageRequest pageRequest) {
+    public PageResponse<Map<String, Object>> getAllUsers(PageRequest pageRequest) {
         Map<String, Object> params = Map.of(
                 "limit", pageRequest.getSize(),
                 "offset", pageRequest.getOffset(),
                 "keyword", pageRequest.getKeyword(),
                 "searchType", pageRequest.getSearchType());
 
-        int totalItems = sampleMapper.count(params);
-        List<Map<String, Object>> list = sampleMapper.findAll(params);
+        int totalItems = userMapper.count(params);
+        List<Map<String, Object>> list = userMapper.findAll(params);
 
         return new PageResponse<>(list, totalItems, pageRequest.getSize(), pageRequest.getPage());
     }
 
-    public Map<String, Object> getSampleById(Long id) {
-        return Optional.ofNullable(sampleMapper.findById(id))
-                .orElseThrow(() -> new ResourceNotFoundException("Sample not found with id: " + id));
+    public Map<String, Object> getUserById(Long id) {
+        return Optional.ofNullable(userMapper.findById(id))
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
-    public void saveSample(Map<String, Object> params) {
+    public void saveUser(Map<String, Object> params) {
         validate(params);
 
         Map<String, Object> mutableParams = new HashMap<>(params);
         String rawPassword = (String) mutableParams.get("password");
         mutableParams.put("password", passwordEncoder.encode(rawPassword));
 
-        sampleMapper.insert(mutableParams);
+        userMapper.insert(mutableParams);
     }
 
-    public void updateSample(Map<String, Object> params) {
+    public void updateUser(Map<String, Object> params) {
         validate(params);
 
         Map<String, Object> mutableParams = new HashMap<>(params);
         String rawPassword = (String) mutableParams.get("password");
         mutableParams.put("password", passwordEncoder.encode(rawPassword));
 
-        sampleMapper.update(mutableParams);
+        userMapper.update(mutableParams);
     }
 
     private void validate(Map<String, Object> params) {
@@ -79,7 +79,7 @@ public class SampleService {
                 });
     }
 
-    public void deleteSample(Long id) {
-        sampleMapper.delete(id);
+    public void deleteUser(Long id) {
+        userMapper.delete(id);
     }
 }

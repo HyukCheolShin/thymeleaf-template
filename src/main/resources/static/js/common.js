@@ -1,5 +1,5 @@
 /**
- * Common JavaScript for Sample Application
+ * Common JavaScript for Application
  */
 
 const App = {

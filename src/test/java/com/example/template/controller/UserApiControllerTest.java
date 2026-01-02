@@ -1,6 +1,6 @@
 package com.example.template.controller;
 
-import com.example.template.service.SampleService;
+import com.example.template.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +15,13 @@ import com.example.template.common.dto.PageRequest;
 import com.example.template.common.dto.PageResponse;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap; // Added import
-import com.fasterxml.jackson.databind.ObjectMapper; // Added import
+import java.util.HashMap;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willThrow; // Added import
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -32,25 +32,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@WebMvcTest(SampleApiController.class)
+@WebMvcTest(UserApiController.class)
 @WithMockUser
 @SuppressWarnings("null")
-class SampleApiControllerTest {
+class UserApiControllerTest {
 
         @Autowired
         private MockMvc mockMvc;
 
         @Autowired
-        private ObjectMapper objectMapper; // Added ObjectMapper injection
+        private ObjectMapper objectMapper;
 
         @MockitoBean
-        private SampleService sampleService;
+        private UserService userService;
 
         @Test
-        @DisplayName("전체 샘플 목록 조회 성공")
-        void getAllSamples() throws Exception {
+        @DisplayName("전체 사용자 목록 조회 성공")
+        void getAllUsers() throws Exception {
                 // given
-                Map<String, Object> sample1 = Map.of(
+                Map<String, Object> user1 = Map.of(
                                 "id", 1L,
                                 "name", "홍길동",
                                 "email", "user1@example.com",
@@ -60,12 +60,12 @@ class SampleApiControllerTest {
                                 "updatedAt", "2025-01-01T12:00:00");
 
                 PageResponse<Map<String, Object>> response = new PageResponse<>(
-                                List.of(sample1), 1, 10, 1);
+                                List.of(user1), 1, 10, 1);
 
-                given(sampleService.getAllSamples(any(PageRequest.class))).willReturn(response);
+                given(userService.getAllUsers(any(PageRequest.class))).willReturn(response);
 
                 // when & then
-                mockMvc.perform(get("/api/samples/")
+                mockMvc.perform(get("/api/users/")
                                 .param("page", "1")
                                 .param("size", "10")
                                 .accept(MediaType.APPLICATION_JSON_VALUE))
@@ -80,10 +80,10 @@ class SampleApiControllerTest {
         }
 
         @Test
-        @DisplayName("샘플 검색 성공")
-        void searchSamples() throws Exception {
+        @DisplayName("사용자 검색 성공")
+        void searchUsers() throws Exception {
                 // given
-                Map<String, Object> sample1 = Map.of(
+                Map<String, Object> user1 = Map.of(
                                 "id", 1L,
                                 "name", "홍길동",
                                 "email", "user1@example.com",
@@ -93,12 +93,12 @@ class SampleApiControllerTest {
                                 "updatedAt", "2025-01-01T12:00:00");
 
                 PageResponse<Map<String, Object>> response = new PageResponse<>(
-                                List.of(sample1), 1, 10, 1);
+                                List.of(user1), 1, 10, 1);
 
-                given(sampleService.getAllSamples(any(PageRequest.class))).willReturn(response);
+                given(userService.getAllUsers(any(PageRequest.class))).willReturn(response);
 
                 // when & then
-                mockMvc.perform(get("/api/samples/")
+                mockMvc.perform(get("/api/users/")
                                 .param("page", "1")
                                 .param("size", "10")
                                 .param("keyword", "홍길동")
@@ -112,11 +112,11 @@ class SampleApiControllerTest {
         }
 
         @Test
-        @DisplayName("ID로 샘플 조회 성공")
-        void getSampleById() throws Exception {
+        @DisplayName("ID로 사용자 조회 성공")
+        void getUserById() throws Exception {
                 // given
                 Long id = 1L;
-                Map<String, Object> sample = Map.of(
+                Map<String, Object> user = Map.of(
                                 "id", id,
                                 "name", "홍길동",
                                 "email", "user1@example.com",
@@ -124,10 +124,10 @@ class SampleApiControllerTest {
                                 "role", "USER",
                                 "createdAt", "2025-01-01T12:00:00",
                                 "updatedAt", "2025-01-01T12:00:00");
-                given(sampleService.getSampleById(id)).willReturn(sample);
+                given(userService.getUserById(id)).willReturn(user);
 
                 // when & then
-                mockMvc.perform(get("/api/samples/{id}", id)
+                mockMvc.perform(get("/api/users/{id}", id)
                                 .accept(MediaType.APPLICATION_JSON_VALUE))
                                 .andExpect(status().isOk())
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -142,13 +142,13 @@ class SampleApiControllerTest {
         }
 
         @Test
-        @DisplayName("샘플 등록 성공")
-        void saveSample() throws Exception {
+        @DisplayName("사용자 등록 성공")
+        void saveUser() throws Exception {
                 // given
                 // params setup removed as it is directly used in content string
 
                 // when & then
-                mockMvc.perform(post("/api/samples/")
+                mockMvc.perform(post("/api/users/")
                                 .with(csrf()) // Spring Security testing usually requires CSRF
                                               // token for POST
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -156,55 +156,55 @@ class SampleApiControllerTest {
                                                 "{\"email\":\"newuser@example.com\",\"password\":\"newpassword\",\"name\":\"New User\",\"role\":\"USER\"}"))
                                 .andExpect(status().isOk());
 
-                verify(sampleService).saveSample(any());
+                verify(userService).saveUser(any());
         }
 
         @Test
-        @DisplayName("샘플 수정 성공")
-        void updateSample() throws Exception {
+        @DisplayName("사용자 수정 성공")
+        void updateUser() throws Exception {
                 // when & then
-                mockMvc.perform(put("/api/samples/1")
+                mockMvc.perform(put("/api/users/1")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content("{\"email\":\"updated@example.com\",\"password\":\"newpassword\",\"name\":\"Updated User\",\"role\":\"ADMIN\"}"))
                                 .andExpect(status().isOk());
 
-                verify(sampleService).updateSample(any());
+                verify(userService).updateUser(any());
         }
 
         @Test
-        @DisplayName("샘플 삭제 성공")
-        void deleteSample() throws Exception {
+        @DisplayName("사용자 삭제 성공")
+        void deleteUser() throws Exception {
                 // when & then
-                mockMvc.perform(delete("/api/samples/1")
+                mockMvc.perform(delete("/api/users/1")
                                 .with(csrf()))
                                 .andExpect(status().isOk());
 
-                verify(sampleService).deleteSample(eq(1L));
+                verify(userService).deleteUser(eq(1L));
         }
 
         @Test
         @DisplayName("예외 발생 시 GlobalExceptionHandler 동작 확인 (ResourceNotFound)")
         void handleExceptionTest() throws Exception {
                 // given
-                given(sampleService.getSampleById(999L))
+                given(userService.getUserById(999L))
                                 .willThrow(new com.example.template.common.exception.ResourceNotFoundException(
-                                                "Sample not found"));
+                                                "User not found"));
 
                 // when & then
-                mockMvc.perform(get("/api/samples/999")
+                mockMvc.perform(get("/api/users/999")
                                 .accept(MediaType.APPLICATION_JSON_VALUE))
                                 .andExpect(status().isNotFound())
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                                 .andExpect(jsonPath("$.code").value("NOT_FOUND"))
-                                .andExpect(jsonPath("$.message").value("Sample not found"));
+                                .andExpect(jsonPath("$.message").value("User not found"));
         }
 
         @Test
         @DisplayName("잘못된 ID 형식 요청 시 400 에러 반환")
         void handleTypeMismatchTest() throws Exception {
                 // when & then
-                mockMvc.perform(get("/api/samples/invalid-id")
+                mockMvc.perform(get("/api/users/invalid-id")
                                 .accept(MediaType.APPLICATION_JSON_VALUE))
                                 .andExpect(status().isBadRequest())
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -217,11 +217,11 @@ class SampleApiControllerTest {
         void validationTest() throws Exception {
                 // given
                 Map<String, Object> params = new HashMap<>(); // Empty params
-                willThrow(new IllegalArgumentException("Field 'name' is required")).given(sampleService)
-                                .saveSample(any());
+                willThrow(new IllegalArgumentException("Field 'name' is required")).given(userService)
+                                .saveUser(any());
 
                 // when & then
-                mockMvc.perform(post("/api/samples/")
+                mockMvc.perform(post("/api/users/")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(params))
                                 .with(csrf()))

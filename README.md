@@ -31,13 +31,13 @@
 - **Common** (`com.example.template.common`): 전역 예외 처리, 유틸리티, 설정 등.
 
 ### 3.2. Security Configuration (`SecurityConfig.java`)
-- **Authentication**: `CustomUserDetailsService`를 통해 DB(`sample` 테이블) 기반 인증을 수행합니다.
+- **Authentication**: `CustomUserDetailsService`를 통해 DB(`users` 테이블) 기반 인증을 수행합니다.
 - **Password Encoding**: `BCryptPasswordEncoder`를 사용하여 비밀번호를 안전하게 암호화합니다.
 - **Login/Logout**:
     - 로그인 페이지: `/login` (커스텀 디자인 적용)
     - 로그아웃: `/logout` (세션 무효화)
-    - 루트 경로(`/`) 접속 시 로그인 여부에 따라 `/samples` 또는 `/login`으로 리다이렉트됩니다.
-- **Access Control**: `/api/**`, `/samples/**` 등 주요 비즈니스 로직은 인증된 사용자만 접근 가능합니다.
+    - 루트 경로(`/`) 접속 시 로그인 여부에 따라 `/users` 또는 `/login`으로 리다이렉트됩니다.
+- **Access Control**: `/api/**`, `/users/**` 등 주요 비즈니스 로직은 인증된 사용자만 접근 가능합니다.
 
 ### 3.3. Logging (`LoggingInterceptor.java`)
 - `WebMvcConfig`에 등록된 인터셉터를 통해 모든 HTTP 요청의 처리 시간을 측정하고 로깅합니다.
@@ -58,7 +58,7 @@
 - **Map 기반 DTO**: 유연한 데이터 처리를 위해 `Map` 및 `CamelCaseMap`을 적극 활용하되, 필요한 경우 명시적 DTO 클래스를 생성합니다.
 
 ```java
-// Good Example (SampleService.java)
+// Good Example (UserService.java)
 Stream.of("name", "email").filter(...).findFirst().ifPresent(...);
 ```
 
@@ -98,7 +98,7 @@ src/main/
 ## 6. 시작하기 (Getting Started)
 
 1. **DB 설정**: `src/main/resources/application.yaml` 파일에서 PostgreSQL 접속 정보를 본인 환경에 맞게 수정합니다.
-2. **데이터 초기화**: `src/main/resources/sql/sample.sql` 스크립트를 실행하여 테이블 생성 및 기초 데이터를 적재합니다.
+2. **데이터 초기화**: `src/main/resources/sql/user.sql` 스크립트를 실행하여 테이블 생성 및 기초 데이터를 적재합니다.
 3. **빌드**: 프로젝트 루트에서 다음 명령어를 실행합니다.
    ```bash
    ./mvnw clean package
@@ -112,7 +112,7 @@ src/main/
      ```bash
      java -jar target/thymeleaf-template-0.0.1-SNAPSHOT.jar
      ```
-5. **접속**: 브라우저에서 `http://localhost:8080/samples` 접속.
+5. **접속**: 브라우저에서 `http://localhost:8080/users` 접속.
 
 ---
 **Written by Application Architect**

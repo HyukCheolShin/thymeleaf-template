@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 @Mapper
-public interface SampleMapper {
+public interface UserMapper {
     List<Map<String, Object>> findAll(Map<String, Object> params);
 
     int count(Map<String, Object> params);

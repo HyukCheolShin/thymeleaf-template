@@ -3,9 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Sample List</title>
-    <meta charset="UTF-8" />
-    <title>Sample List</title>
+    <title>User List</title>
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/jquery-3.7.1.min.js"></script>
     <script src="/js/common.js"></script>
@@ -15,13 +13,13 @@
 
 <body>
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Sample List</h2>
+        <h2>User List</h2>
         <div>
             <form action="/logout" method="post" style="display:inline;">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit" class="btn btn-secondary me-2">Logout</button>
             </form>
-            <a href="/samples/form" class="btn btn-primary">Add Sample</a>
+            <a href="/users/form" class="btn btn-primary">Add User</a>
         </div>
     </div>
 
@@ -54,7 +52,7 @@
                 <th>Action</th>
             </tr>
         </thead>
-        <tbody id="sampleTableBody">
+        <tbody id="userTableBody">
         </tbody>
     </table>
 
@@ -99,13 +97,13 @@
                 }
             };
 
-            // Function to load samples
-            const loadSamples = (page = 1) => {
+            // Function to load users
+            const loadUsers = (page = 1) => {
                 const keyword = $('#keyword').val();
                 const searchType = $('#searchType').val();
 
                 $.ajax({
-                    url: '/api/samples/',
+                    url: '/api/users/',
                     type: 'GET',
                     data: {
                         page: page,
@@ -117,24 +115,24 @@
                     success: (response) => {
                         const { list, totalPages, currentPage: responsePage } = response.data;
 
-                        const tableBody = $('#sampleTableBody');
+                        const tableBody = $('#userTableBody');
                         tableBody.empty();
 
-                        $.each(list, (index, sample) => {
+                        $.each(list, (index, user) => {
                             const row = $('<tr>');
-                            row.data('sample', sample);
+                            row.data('user', user);
 
-                            row.append($('<td>').text(sample.id));
-                            row.append($('<td>').text(sample.email));
-                            row.append($('<td>').text(sample.password));
-                            row.append($('<td>').text(sample.name));
-                            row.append($('<td>').text(sample.role));
-                            row.append($('<td>').text(sample.createdAt));
-                            row.append($('<td>').text(sample.updatedAt));
+                            row.append($('<td>').text(user.id));
+                            row.append($('<td>').text(user.email));
+                            row.append($('<td>').text(user.password));
+                            row.append($('<td>').text(user.name));
+                            row.append($('<td>').text(user.role));
+                            row.append($('<td>').text(user.createdAt));
+                            row.append($('<td>').text(user.updatedAt));
 
                             const actionTd = $('<td>');
-                            const editBtn = $(`<a href="/samples/${sample.id}">`).text('Edit').addClass('btn btn-sm btn-primary').css('margin-right', '5px');
-                            const deleteBtn = $('<button>').text('Delete').addClass('btn btn-sm btn-danger btn-delete').data('id', sample.id);
+                            const editBtn = $(`<a href="/users/${user.id}">`).text('Edit').addClass('btn btn-sm btn-primary').css('margin-right', '5px');
+                            const deleteBtn = $('<button>').text('Delete').addClass('btn btn-sm btn-danger btn-delete').data('id', user.id);
                             actionTd.append(editBtn).append(deleteBtn);
                             row.append(actionTd);
 
@@ -150,12 +148,12 @@
             };
 
             // Initial load
-            loadSamples(currentPage);
+            loadUsers(currentPage);
 
             // Search button click
             $('#btnSearch').on('click', () => {
                 currentPage = 1;
-                loadSamples();
+                loadUsers();
             });
 
             // Enter key in search input
@@ -166,16 +164,16 @@
             });
 
             // Delete button click handler
-            $(document).on('click', '.btn-delete', function () { // Arrow function not used here to preserve 'this' context unless $(this) is replaced
+            $(document).on('click', '.btn-delete', function () {
                 if (!confirm('정말 삭제하시겠습니까?')) return;
 
                 const id = $(this).data('id');
                 $.ajax({
-                    url: `/api/samples/${id}`,
+                    url: `/api/users/${id}`,
                     type: 'DELETE',
                     success: () => {
                         alert('삭제되었습니다.');
-                        loadSamples(currentPage);
+                        loadUsers(currentPage);
                     },
                     error: (xhr) => {
                         App.handleAjaxError(xhr, '삭제 중 오류가 발생했습니다.');
@@ -184,12 +182,12 @@
             });
 
             // Pagination click handler
-            $(document).on('click', '.page-link', function (e) { // Arrow function not used here to preserve 'this' context
+            $(document).on('click', '.page-link', function (e) {
                 e.preventDefault();
                 const page = $(this).data('page');
                 if (page) {
                     currentPage = page;
-                    loadSamples(page);
+                    loadUsers(page);
                 }
             });
         });
