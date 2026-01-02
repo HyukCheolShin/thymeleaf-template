@@ -29,6 +29,7 @@ server:
 
 
 mybatis:
+  type-aliases-package: com.example.template.common.map
   mapper-locations: classpath:mapper/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl

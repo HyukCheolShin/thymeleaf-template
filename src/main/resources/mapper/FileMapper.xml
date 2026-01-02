@@ -10,7 +10,7 @@
         )
     </insert>
 
-    <select id="findByRef" parameterType="map" resultType="com.example.template.common.map.CamelCaseMap">
+    <select id="findByRef" parameterType="map" resultType="CamelCaseMap">
         SELECT 
             id, ref_table, ref_id, original_name, save_name, size, extension, path, created_at, created_by
         FROM files 
@@ -18,7 +18,7 @@
         ORDER BY id ASC
     </select>
 
-    <select id="findById" parameterType="long" resultType="com.example.template.common.map.CamelCaseMap">
+    <select id="findById" parameterType="long" resultType="CamelCaseMap">
         SELECT 
             id, ref_table, ref_id, original_name, save_name, size, extension, path, created_at, created_by
         FROM files 
