@@ -43,6 +43,13 @@
 - `WebMvcConfig`에 등록된 인터셉터를 통해 모든 HTTP 요청의 처리 시간을 측정하고 로깅합니다.
 - **Log Pattern**: `[REQUEST] [METHOD] URL Duration`
 
+### 3.4. Session Storage Strategy (중요)
+본 프로젝트는 **Runtime Auto Detection**을 통해 별도의 프로필 설정 없이 환경에 적응합니다.
+- **Auto Detection Logic**: 애플리케이션 시작 시(`main` 메소드) `localhost:6379` 연결을 시도합니다.
+    - **연결 성공**: `spring.session.store-type=redis`로 설정 (Redis 세션 사용).
+    - **연결 실패**: `spring.session.store-type=none`으로 설정 및 `RedisAutoConfiguration` 제외 (내장 Tomcat 세션 사용).
+- **장점**: 개발자는 Redis 설치 여부와 관계없이 동일한 명령어로 애플리케이션을 실행할 수 있습니다.
+
 ## 4. 개발 표준 가이드 (Development Standards)
 
 ### 4.1. Java (Backend)
@@ -85,7 +92,7 @@ src/main/
     ├── mapper/             # MyBatis XML Files
     ├── static/             # JS, CSS, Images
     ├── templates/          # Thymeleaf HTML
-    └── application.yaml    # Application Configuration
+    └── application.yaml    # 통합 설정 (DB, Log, Session 등)
 ```
 
 ## 6. 시작하기 (Getting Started)
@@ -96,11 +103,16 @@ src/main/
    ```bash
    ./mvnw clean package
    ```
-3. **실행**:
+3. **빌드**: 프로젝트 루트에서 다음 명령어를 실행합니다.
    ```bash
-   java -jar target/thymeleaf-template-0.0.1-SNAPSHOT.jar
+   ./mvnw clean package
    ```
-4. **접속**: 브라우저에서 `http://localhost:8080/samples` 접속.
+4. **실행 (Execution)**:
+   - 별도의 옵션 없이 실행하면, 애플리케이션이 자동으로 환경을 감지합니다.
+     ```bash
+     java -jar target/thymeleaf-template-0.0.1-SNAPSHOT.jar
+     ```
+5. **접속**: 브라우저에서 `http://localhost:8080/samples` 접속.
 
 ---
 **Written by Application Architect**
