@@ -2,7 +2,6 @@ spring:
   application:
     name: thymeleaf-template
   session:
-    store-type: redis
     redis:
       namespace: template:session
   data:
