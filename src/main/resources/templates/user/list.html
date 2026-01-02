@@ -128,8 +128,8 @@
                             row.append($('<td>').text(user.password));
                             row.append($('<td>').text(user.name));
                             row.append($('<td>').text(user.role));
-                            row.append($('<td>').text(user.createdAt));
-                            row.append($('<td>').text(user.updatedAt));
+                            row.append($('<td>').text(App.formatDate(user.createdAt)));
+                            row.append($('<td>').text(App.formatDate(user.updatedAt)));
 
                             tableBody.append(row);
                         });
