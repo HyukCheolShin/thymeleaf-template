@@ -3,6 +3,8 @@ spring:
     name: thymeleaf-template
   session:
     store-type: redis
+    redis:
+      namespace: template:session
   data:
     redis:
       host: localhost
@@ -14,6 +16,13 @@ spring:
     driver-class-name: org.postgresql.Driver
   jackson:
     time-zone: Asia/Seoul
+
+
+server:
+  servlet:
+    session:
+      cookie:
+        name: JSESSIONID
 
 
 mybatis:
