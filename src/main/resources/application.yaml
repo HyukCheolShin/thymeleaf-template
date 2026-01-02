@@ -1,6 +1,10 @@
 spring:
   application:
     name: thymeleaf-template
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   session:
     redis:
       namespace: template:session
@@ -34,4 +38,7 @@ mybatis:
 logging:
   level:
     com.example.template.mapper: DEBUG
+
+file:
+  upload-dir: C:/uploads/
 

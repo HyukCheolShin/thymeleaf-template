@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 import com.example.template.common.exception.ResourceNotFoundException;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 
 @Service
@@ -19,10 +21,12 @@ public class UserService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final FileService fileService;
 
-    public UserService(UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserMapper userMapper, PasswordEncoder passwordEncoder, FileService fileService) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.fileService = fileService;
     }
 
     public PageResponse<Map<String, Object>> getAllUsers(PageRequest pageRequest) {
@@ -43,7 +47,8 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
-    public void saveUser(Map<String, Object> params) {
+    @Transactional
+    public Long saveUser(Map<String, Object> params, MultipartFile file) {
         validate(params);
 
         Map<String, Object> mutableParams = new HashMap<>(params);
@@ -51,16 +56,39 @@ public class UserService {
         mutableParams.put("password", passwordEncoder.encode(rawPassword));
 
         userMapper.insert(mutableParams);
+        Long userId = (Long) mutableParams.get("id");
+
+        if (file != null && !file.isEmpty()) {
+            fileService.uploadFile(file, "users", userId);
+        }
+
+        return userId;
     }
 
-    public void updateUser(Map<String, Object> params) {
+    @Transactional
+    public void updateUser(Map<String, Object> params, MultipartFile file) {
         validate(params);
 
         Map<String, Object> mutableParams = new HashMap<>(params);
         String rawPassword = (String) mutableParams.get("password");
-        mutableParams.put("password", passwordEncoder.encode(rawPassword));
+        if (rawPassword != null && !rawPassword.trim().isEmpty()) {
+            mutableParams.put("password", passwordEncoder.encode(rawPassword));
+        } else {
+            // If password is blank in update, maybe we shouldn't encode empty string or
+            // should skip?
+            // Existing logic forced encoding. But validate checks for password presence.
+            // If update allows partial, validate might need adjustment, but current
+            // validate enforces required fields.
+            // I will stick to current logic: encode it.
+            mutableParams.put("password", passwordEncoder.encode(rawPassword));
+        }
 
         userMapper.update(mutableParams);
+
+        if (file != null && !file.isEmpty()) {
+            Long userId = (Long) mutableParams.get("id");
+            fileService.uploadFile(file, "users", userId);
+        }
     }
 
     private void validate(Map<String, Object> params) {
@@ -79,7 +107,9 @@ public class UserService {
                 });
     }
 
+    @Transactional
     public void deleteUser(Long id) {
+        fileService.deleteFilesByRef("users", id);
         userMapper.delete(id);
     }
 }

@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -148,28 +148,32 @@ class UserApiControllerTest {
                 // params setup removed as it is directly used in content string
 
                 // when & then
-                mockMvc.perform(post("/api/users/")
-                                .with(csrf()) // Spring Security testing usually requires CSRF
-                                              // token for POST
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(
-                                                "{\"email\":\"newuser@example.com\",\"password\":\"newpassword\",\"name\":\"New User\",\"role\":\"USER\"}"))
+                mockMvc.perform(multipart("/api/users/")
+                                .param("email", "newuser@example.com")
+                                .param("password", "newpassword")
+                                .param("name", "New User")
+                                .param("role", "USER")
+                                .with(csrf())
+                                .contentType(MediaType.MULTIPART_FORM_DATA))
                                 .andExpect(status().isOk());
 
-                verify(userService).saveUser(any());
+                verify(userService).saveUser(any(), any());
         }
 
         @Test
         @DisplayName("사용자 수정 성공")
         void updateUser() throws Exception {
                 // when & then
-                mockMvc.perform(put("/api/users/1")
+                mockMvc.perform(multipart("/api/users/1")
+                                .param("email", "updated@example.com")
+                                .param("password", "newpassword")
+                                .param("name", "Updated User")
+                                .param("role", "ADMIN")
                                 .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content("{\"email\":\"updated@example.com\",\"password\":\"newpassword\",\"name\":\"Updated User\",\"role\":\"ADMIN\"}"))
+                                .contentType(MediaType.MULTIPART_FORM_DATA))
                                 .andExpect(status().isOk());
 
-                verify(userService).updateUser(any());
+                verify(userService).updateUser(any(), any());
         }
 
         @Test
@@ -216,14 +220,11 @@ class UserApiControllerTest {
         @DisplayName("필수 값 누락 시 400 에러 반환")
         void validationTest() throws Exception {
                 // given
-                Map<String, Object> params = new HashMap<>(); // Empty params
                 willThrow(new IllegalArgumentException("Field 'name' is required")).given(userService)
-                                .saveUser(any());
+                                .saveUser(any(), any());
 
                 // when & then
-                mockMvc.perform(post("/api/users/")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(params))
+                mockMvc.perform(multipart("/api/users/")
                                 .with(csrf()))
                                 .andExpect(status().isBadRequest())
                                 .andExpect(jsonPath("$.code").value("BAD_REQUEST"))

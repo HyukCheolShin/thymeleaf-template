@@ -19,13 +19,11 @@ public class UserController {
     }
 
     @GetMapping("/form")
-    public String form() {
+    public String form(@org.springframework.web.bind.annotation.RequestParam(required = false) Long id, Model model) {
+        if (id != null) {
+            model.addAttribute("id", id);
+        }
         return "user/form";
     }
 
-    @GetMapping("/{id}")
-    public String form(@PathVariable Long id, Model model) {
-        model.addAttribute("id", id);
-        return "user/form";
-    }
 }

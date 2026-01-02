@@ -48,7 +48,7 @@
         SELECT id, email, password, name, role, created_at, updated_at FROM users WHERE id = #{id}
     </select>
 
-    <insert id="insert" parameterType="map">
+    <insert id="insert" parameterType="map" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO users (email, password, name, role)
         VALUES (#{email}, #{password}, #{name}, #{role})
     </insert>

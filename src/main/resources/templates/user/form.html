@@ -13,7 +13,7 @@
 <body>
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 th:text="${id == null ? 'Add User' : 'Edit User'}">User Form</h2>
+            <h2 id="pageTitle" th:text="${id == null ? 'Add User' : 'Read User'}">User Form</h2>
             <form action="/logout" method="post" style="display:inline;">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit" class="btn btn-secondary">Logout</button>
@@ -41,18 +41,134 @@
                     <option value="ADMIN">ADMIN</option>
                 </select>
             </div>
+            <div class="mb-3">
+                <label class="form-label">Attachments</label>
+                <div id="fileUploadArea">
+                    <input type="file" class="form-control" id="file" name="file">
+                </div>
+            </div>
 
-            <button type="submit" class="btn btn-primary">Save</button>
-            <button type="button" class="btn btn-secondary" onclick="location.href='/users'">Cancel</button>
+            <div id="buttonGroup">
+                <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
+                <button type="button" class="btn btn-primary" id="btnEdit" style="display:none;">Edit</button>
+                <button type="button" class="btn btn-danger" id="btnDelete" style="display:none;">Delete</button>
+                <button type="button" class="btn btn-secondary" onclick="location.href='/users'">Cancel</button>
+            </div>
         </form>
     </div>
 
     <script>
         $(() => {
-            // Function to load user data for editing
-            const loadUser = (id) => {
+            const id = $('#id').val();
+
+            // Function to set read-only mode
+            const setReadOnly = (isReadOnly) => {
+                $('#userForm input:not([type="hidden"]), #userForm select').prop('disabled', isReadOnly);
+
+                if (isReadOnly) {
+                    $('#btnSave').hide();
+                    $('#btnEdit').show();
+                    $('#btnDelete').show();
+                    $('#file').hide(); // Hide file input in read-only
+                    $('.btn-file-delete').hide(); // Hide file delete buttons
+                    $('#pageTitle').text('Read User');
+                } else {
+                    $('#btnSave').show();
+                    $('#btnEdit').hide();
+                    $('#btnDelete').hide();
+                    $('#file').show(); // Show file input in edit mode
+                    $('.btn-file-delete').show(); // Show file delete buttons
+
+                    if (id) {
+                        $('#pageTitle').text('Edit User');
+                    } else {
+                        $('#pageTitle').text('Add User');
+                    }
+                }
+            };
+
+            // Delete Button Click
+            $('#btnDelete').on('click', () => {
+                if (!confirm('정말 삭제하시겠습니까?')) return;
+
                 $.ajax({
                     url: `/api/users/${id}`,
+                    type: 'DELETE',
+                    success: () => {
+                        alert('삭제되었습니다.');
+                        window.location.href = '/users';
+                    },
+                    error: (xhr) => {
+                        App.handleAjaxError(xhr, '삭제 중 오류가 발생했습니다.');
+                    }
+                });
+            });
+
+            const loadFiles = (refId) => {
+                $.ajax({
+                    url: '/api/files/',
+                    type: 'GET',
+                    data: {
+                        refTable: 'users',
+                        refId: refId
+                    },
+                    success: (response) => {
+                        const files = response.data;
+                        if (files && files.length > 0) {
+                            // Clean up existing list
+                            $('#fileList').remove();
+
+                            const $list = $('<ul id="fileList" class="list-group mt-2"></ul>');
+                            files.forEach(file => {
+                                const $li = $(`
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>
+                                            <a href="/api/files/download/${file.id}">${file.originalName}</a>
+                                            <span class="badge bg-secondary rounded-pill ms-2">${(file.size / 1024).toFixed(2)} KB</span>
+                                        </span>
+                                        <button type="button" class="btn btn-sm btn-danger btn-file-delete" data-id="${file.id}" style="display:none;">X</button>
+                                    </li>
+                                `);
+                                $list.append($li);
+                            });
+
+                            $('#fileUploadArea').append($list);
+
+                            if ($('#btnSave').is(':visible')) {
+                                $('.btn-file-delete').show();
+                            }
+                        } else {
+                            $('#fileList').remove(); // Ensure list is removed if no files
+                        }
+                    },
+                    error: (xhr) => {
+                        console.error('Failed to load files', xhr);
+                    }
+                });
+            };
+
+            // File Delete Button Click
+            $(document).on('click', '.btn-file-delete', function (e) {
+                e.preventDefault();
+                if (!confirm("이 파일을 삭제하시겠습니까?")) return;
+                const fileId = $(this).data('id');
+
+                $.ajax({
+                    url: `/api/files/${fileId}`,
+                    type: 'DELETE',
+                    success: () => {
+                        alert('파일이 삭제되었습니다.');
+                        loadFiles(id); // Reload list
+                    },
+                    error: (xhr) => {
+                        App.handleAjaxError(xhr, '파일 삭제 실패');
+                    }
+                });
+            });
+
+            const loadUser = (userId) => {
+                $.ajax({
+                    url: `/api/users/${userId}`,
                     type: 'GET',
                     success: (response) => {
                         const data = response.data;
@@ -60,6 +176,9 @@
                         $('#email').val(data.email);
                         $('#password').val(data.password);
                         $('#role').val(data.role);
+
+                        // Load files
+                        loadFiles(userId);
                     },
                     error: (xhr) => {
                         App.handleAjaxError(xhr, '데이터 로딩 실패', true);
@@ -67,42 +186,56 @@
                 });
             };
 
-            const id = $('#id').val();
-
+            // Initialization
             if (id) {
+                // Edit Mode: Load data and set Read-Only
                 loadUser(id);
+                setReadOnly(true);
+            } else {
+                // Create Mode: Editable
+                setReadOnly(false);
             }
+
+            // Edit Button Click
+            $('#btnEdit').on('click', () => {
+                setReadOnly(false);
+            });
 
             // Save Form
             $('#userForm').on('submit', (e) => {
                 e.preventDefault();
 
-                const userData = {
-                    name: $('#name').val(),
-                    email: $('#email').val(),
-                    password: $('#password').val(),
-                    role: $('#role').val()
-                };
+
+
+                // If creating (No ID), use POST with FormData (Transactional)
+                const formData = new FormData();
+                formData.append('name', $('#name').val());
+                formData.append('email', $('#email').val());
+                formData.append('password', $('#password').val());
+                formData.append('role', $('#role').val());
+
+                const fileInput = $('#file')[0];
+                if (fileInput.files.length > 0) {
+                    formData.append('file', fileInput.files[0]);
+                }
 
                 let url = '/api/users/';
-                let type = 'POST';
-
                 if (id) {
                     url += id;
-                    type = 'PUT';
                 }
 
                 $.ajax({
                     url: url,
-                    type: type,
-                    contentType: 'application/json',
-                    data: JSON.stringify(userData),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
                     success: () => {
-                        alert('저장되었습니다.');
+                        alert(id ? '수정되었습니다.' : '저장되었습니다.');
                         window.location.href = '/users';
                     },
                     error: (xhr) => {
-                        App.handleAjaxError(xhr, '저장 실패', false);
+                        App.handleAjaxError(xhr, id ? '수정 실패' : '저장 실패', false);
                     }
                 });
             });
