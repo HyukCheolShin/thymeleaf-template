@@ -1,111 +1,78 @@
-# Thymeleaf Template Project - Developer Guide
+# Thymeleaf 템플릿 프로젝트 - 개발자 가이드
 
-## 1. Project Overview
-이 프로젝트는 **Spring Boot 3.5.9**와 **Thymeleaf**, **MyBatis**를 기반으로 한 웹 애플리케이션 템플릿입니다.  
-보안(Security), 세션 관리(Redis), 로깅, 예외 처리가 사전에 구성되어 있어 빠른 개발 착수가 가능합니다.
-
----
-
-## 2. Technical Stack
-
-### Backend
-- **Language**: Java 21
-- **Framework**: Spring Boot 3.5.9
-- **Database**: PostgreSQL
-- **ORM**: MyBatis 3.0.5
-- **Session**: Redis
-- **Security**: Spring Security 6
-- **Template Engine**: Thymeleaf
-- **Build Tool**: Maven
-
-### Frontend
-- **HTML/CSS/JS**: Vanilla (Thymeleaf Integration)
-- **Library**: jQuery 3.7.1
-- **UI Framework**: Bootstrap 5
+## 1. 프로젝트 개요 (Project Overview)
+이 프로젝트는 **Spring Boot 3.5.9**와 **Thymeleaf**, **MyBatis**, **PostgreSQL**을 기반으로 한 웹 애플리케이션 템플릿입니다.  
+보안, 세션 관리, 로깅, 예외 처리 등 필수 기능이 사전 구성되어 있어 즉시 비즈니스 로직 개발이 가능합니다.
 
 ---
 
-## 3. Project Structure (Architecture)
+## 2. 기술 스택 (Technical Stack)
 
+### 백엔드 (Backend)
+- **프레임워크**: Spring Boot 3.5.9 (Java 21)
+- **퍼시스턴스**: MyBatis 3.0.5, PostgreSQL
+- **보안**: Spring Security 6 (BCrypt, CSRF)
+- **세션**: Spring Session Data Redis
+- **유틸리티**: Lombok, Jasypt 3.0.5 (설정 암호화)
+
+### 프론트엔드 (Frontend)
+- **템플릿 엔진**: Thymeleaf + Extras Spring Security
+- **라이브러리**: jQuery 3.7.1, Bootstrap 5.3
+- **아키텍처**: 모듈화된 JavaScript & AJAX Wrapper
+
+---
+
+## 3. 주요 기능 (Key Features)
+
+### 3.1. 핵심 기능 (Core Features)
+- **사용자 관리**: 사용자 목록, 상세, 등록(파일첨부), 수정, 삭제 (전체 CRUD)
+- **파일 업로드**: 로컬 파일 시스템 저장 및 DB 메타데이터 관리
+- **로그인/인증**: Form 기반 로그인, 로그아웃, 접근 제어
+
+### 3.2. 아키텍처 및 인프라 (Architecture & Infrastructure)
+- **요청 로깅**: `LoggingInterceptor`를 통해 모든 요청의 처리 시간을 측정 및 로깅 (정적 리소스 제외)
+- **설정 암호화**: `Jasypt`를 사용하여 민감한 설정 정보(DB 패스워드 등) 암호화 (`ENC(...)`)
+- **전역 예외 처리**: `GlobalExceptionHandler`에서 비즈니스 및 시스템 예외 중앙 처리
+
+### 3.3. 세션 관리 정책 (Session Management Policy)
+- **글로벌 타임아웃**: **30분** (모든 환경 공통 적용)
+- **In-Memory 모드** (`local-inmemory`): Tomcat Native Session 사용 (Spring Session 비활성화로 성능 최적화)
+- **Redis 모드** (`local-redis`, `dev`, `stg`, `prd`): Spring Session + Redis 연동
+
+### 3.4. 프론트엔드 아키텍처 (Frontend Architecture)
+- **API Wrapper**: `api.js`의 `App.get/post/put/delete`를 통한 표준화된 비동기 통신
+- **모듈 (Modules)**:
+  - `ui.js`: 페이징 렌더링 등 UI 제어
+  - `utils.js`: 날짜 포맷팅 등 유틸리티
+
+---
+
+## 4. 프로젝트 구조 (Project Structure)
 ```
-com.example.template
-├── common                  # 공통 모듈
-│   ├── dto                 # 공통 DTO
-│   ├── exception           # 전역 예외 처리
-│   ├── interceptor         # 웹 인터셉터
-│   └── map                 # MyBatis용 맵핑 클래스
-├── config                  # 설정 클래스
-│   ├── RedisConfig.java    # Redis 및 세션 직렬화 설정
-│   ├── SecurityConfig.java # Spring Security 설정
-│   └── WebMvcConfig.java   # Web MVC 설정
-├── controller              # 웹 컨트롤러
+src/main/java/com/example/template
+├── common                  # 공통 모듈 (Interceptor, Exception, DTO)
+├── config                  # 설정 (Redis, Security, WebMvc, Jasypt)
+├── controller              # API 및 View 컨트롤러
 ├── service                 # 비즈니스 로직
-├── mapper                  # MyBatis 매퍼 인터페이스
-└── ThymeleafTemplateApplication.java # 메인 클래스
+└── mapper                  # MyBatis Mapper Interface
 ```
 
 ---
 
-## 4. Key Features
+## 5. 실행 방법 (How to Run)
 
-### 4.1. User Management
-- 사용자 목록, 상세 조회, 수정, 삭제 기능 구현 (CRUD)
-- Thymeleaf + Bootstrap 5 기반의 반응형 UI
-- 검색 및 페이징 처리
+### 사전 요구사항 (Prerequisites)
+- Java 21+
+- PostgreSQL (Port 5432)
+- Redis (`local-inmemory` 사용 시 선택 사항)
 
-### 4.2. Security & Session
-- **Spring Security**: 로그인/로그아웃, BCrypt 패스워드 암호화
-- **Redis Session**: 세션 정보를 Redis에 **JSON** 포맷으로 저장 (가독성 확보)
-- **CSRF Protection**: 모든 POST/PUT/DELETE 요청에 CSRF 토큰 검증 필수
+### 실행 명령어 (Run Commands)
+1. **로컬 개발 (In-Memory Session)** - *빠른 개발용 (권장)*
+   ```bash
+   ./mvnw spring-boot:run
+   ```
 
----
-
-## 5. Development Guidelines
-
-### 5.1. Naming Conventions
-- **Class**: PascalCase (e.g., `UserService`)
-- **Method/Variable**: camelCase (e.g., `findUserById`)
-- **DB Table/Column**: snake_case (e.g., `user_info`)
-- **URL**: kebab-case (e.g., `/api/user-profiles`)
-
-### 5.2. Architecture Flow
-`Controller` -> `Service` -> `Mapper` -> `Database`
-- **Controller**: 요청 검증 및 응답 반환 (`ApiResponse` 사용 권장)
-- **Service**: 비즈니스 로직 및 트랜잭션 처리 (`@Transactional`)
-- **Mapper**: DB 쿼리 실행 (MyBatis XML)
-
-### 5.3. Exception Handling
-- 모든 예외는 `GlobalExceptionHandler`에서 중앙 처리됩니다.
-- 비즈니스 로직 예외는 `IllegalArgumentException` 또는 커스텀 예외를 사용하세요.
-
-### 5.4. Frontend (Thymeleaf & JS)
-- **Layout**: `nav.html`, `head.html` 등 공통 프래그먼트 재사용 (`th:replace`)
-### 5.4. Frontend (Thymeleaf & JS)
-- **Modules**: `JS` 파일이 역할별로 분리되어 있습니다.
-  - `api.js`: API 호출 및 공통 에러 핸들링 (App.api)
-  - `utils.js`: 유틸리티 함수 (날짜 포맷 등)
-  - `ui.js`: UI 관련 함수 (페이징 등)
-- **AJAX**: `api.js`에 정의된 `App` 헬퍼 메소드를 사용하세요.
-  - **GET**: `App.get(url, params, { success: fn })`
-  - **POST**: `App.post(url, data, { success: fn })` (JSON 자동 변환)
-  - **PUT**: `App.put(url, data, { success: fn })`
-  - **DELETE**: `App.delete(url, data, { success: fn })`
-  - *Response Code 체크(`if(res.code==='SUCCESS')`)는 내부에서 자동 처리되므로, 성공 로직만 작성하면 됩니다.*
-
----
-
-## 6. How to Run
-
-### Prerequisites
-1. **Java 21** Installed
-2. **PostgreSQL** Running (Port 5432)
-3. **Redis** Running (Port 6379)
-
-### Run Application
-```bash
-# 기본 실행
-./mvnw spring-boot:run
-
-# Redis 프로필 활성화 실행 (세션 연동 시 필수)
-./mvnw spring-boot:run -Dspring-boot.run.profiles=redis
-```
+2. **로컬 개발 (Redis Session)** - *Redis 연동 테스트용*
+   ```bash
+   ./mvnw spring-boot:run -Dspring-boot.run.profiles=local-redis
+   ```
