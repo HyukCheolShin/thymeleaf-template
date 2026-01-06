@@ -38,6 +38,27 @@ const App = {
     },
 
     /**
+     * Common API wrapper for $.ajax
+     * @param {Object} options - $.ajax options
+     */
+    api(options) {
+        const defaults = {
+            type: 'GET',
+            dataType: 'json',
+            error: (xhr) => {
+                App.handleAjaxError(xhr);
+            }
+        };
+        const settings = $.extend({}, defaults, options);
+
+        // Wrap success to handle custom response code check if needed
+        // Assuming implementation handles response.code === 'SUCCESS' inside individual success callbacks for now,
+        // or we can generalize it here. Use simple delegation for now.
+
+        return $.ajax(settings);
+    },
+
+    /**
      * Format date string to YYYY-MM-DD HH:mm:ss
      * @param {String} dateString 
      * @returns {String} formatted date or empty string
