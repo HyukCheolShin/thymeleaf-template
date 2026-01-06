@@ -14,6 +14,7 @@
 - **보안**: Spring Security 6 (BCrypt, CSRF)
 - **세션**: Spring Session Data Redis
 - **유틸리티**: Lombok, Jasypt 3.0.5 (설정 암호화)
+- **빌드 툴**: Maven
 
 ### 프론트엔드 (Frontend)
 - **템플릿 엔진**: Thymeleaf + Extras Spring Security

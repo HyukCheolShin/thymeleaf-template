@@ -106,7 +106,7 @@
             }, {
                 success: function (response) {
                     renderTable(response.data.list);
-                    App.renderPagination(response.data, keyword, searchType);
+                    App.renderPagination(response.data);
 
                     // pushHistory가 true일 때만 URL 업데이트 (뒤로가기 시에는 false)
                     if (pushHistory) {

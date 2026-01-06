@@ -12,14 +12,21 @@ if (typeof App === 'undefined') {
      * @param {String} jsFunction - JS function to call on click (default: 'loadUsers')
      */
     App.renderPagination = function (data, jsFunction = 'loadUsers') {
-        const container = $('nav ul.pagination');
-        container.empty();
+        const $ul = $('nav ul.pagination');
+        const $container = $ul.closest('.pagination-container');
 
-        if (data.totalPages <= 1) return;
+        $ul.empty();
+
+        if (data.totalPages <= 1) {
+            $container.hide();
+            return;
+        }
+
+        $container.show();
 
         // Previous
         const prevDisabled = data.currentPage === 1 ? 'disabled' : '';
-        container.append(`
+        $ul.append(`
             <li class="page-item ${prevDisabled}">
                 <a class="page-link" href="#" onclick="${jsFunction}(${data.currentPage - 1}); return false;">&laquo;</a>
             </li>
@@ -31,7 +38,7 @@ if (typeof App === 'undefined') {
 
         for (let i = startPage; i <= endPage; i++) {
             const active = i === data.currentPage ? 'active' : '';
-            container.append(`
+            $ul.append(`
                 <li class="page-item ${active}">
                     <a class="page-link" href="#" onclick="${jsFunction}(${i}); return false;">${i}</a>
                 </li>
@@ -40,7 +47,7 @@ if (typeof App === 'undefined') {
 
         // Next
         const nextDisabled = data.currentPage === data.totalPages ? 'disabled' : '';
-        container.append(`
+        $ul.append(`
             <li class="page-item ${nextDisabled}">
                 <a class="page-link" href="#" onclick="${jsFunction}(${data.currentPage + 1}); return false;">&raquo;</a>
             </li>

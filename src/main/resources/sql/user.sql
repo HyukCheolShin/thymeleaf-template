@@ -33,7 +33,8 @@ VALUES
     (8, 'user8@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user8', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
     (9, 'user9@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user9', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
     (10, 'user10@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user10', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
-    (11, 'user11@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user11', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182');
+    (11, 'user11@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user11', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
+    (12, 'user12@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user12', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182');
 
 
-ALTER SEQUENCE users_id_seq RESTART WITH 12;
+ALTER SEQUENCE users_id_seq RESTART WITH 13;
