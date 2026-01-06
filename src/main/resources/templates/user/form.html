@@ -2,16 +2,18 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-    <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
     <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/common.js"></script>
-    <link href="/css/style.css" rel="stylesheet">
     <meta name="_csrf" th:content="${_csrf.token}" />
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 
 <body>
-    <div class="container mt-5">
+    <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 id="pageTitle" th:text="${id == null ? 'Add User' : 'Read User'}">User Form</h2>
             <form action="/logout" method="post" style="display:inline;">
@@ -41,7 +43,7 @@
                     <option value="ADMIN">ADMIN</option>
                 </select>
             </div>
-            <div class="mb-3">
+            <div class="mb-3" id="attachmentContainer">
                 <label class="form-label">Attachments</label>
                 <div id="fileUploadArea">
                     <input type="file" class="form-control" id="file" name="file">
@@ -73,12 +75,18 @@
                     $('#btnDelete').show();
                     $('#file').hide(); // Hide file input in read-only
                     $('.btn-file-delete').hide(); // Hide file delete buttons
+
+                    if ($('#fileList').children().length === 0) {
+                        $('#attachmentContainer').hide();
+                    }
+
                     $('#pageTitle').text('Read User');
                 } else {
                     $('#btnSave').show();
                     $('#btnEdit').hide();
                     $('#btnDelete').hide();
                     $('#file').show(); // Show file input in edit mode
+                    $('#attachmentContainer').show();
                     $('.btn-file-delete').show(); // Show file delete buttons
 
                     if (id) {
@@ -139,8 +147,12 @@
                             if ($('#btnSave').is(':visible')) {
                                 $('.btn-file-delete').show();
                             }
+                            $('#attachmentContainer').show();
                         } else {
                             $('#fileList').remove(); // Ensure list is removed if no files
+                            if ($('#file').is(':hidden')) {
+                                $('#attachmentContainer').hide();
+                            }
                         }
                     },
                     error: (xhr) => {

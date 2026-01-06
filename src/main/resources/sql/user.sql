@@ -20,10 +20,20 @@ COMMENT ON COLUMN users.created_at IS '생성일시';
 COMMENT ON COLUMN users.updated_at IS '수정일시';
 
 -- 사용자 데이터 삽입 (비밀번호는 1임)
-INSERT INTO public.users
-(id, email, "password", "name", "role", created_at, updated_at)
-VALUES(1, 'admin@naver.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'admin', 'ADMIN', '2025-12-31 15:25:40.063', '2025-12-31 15:25:40.063');
-INSERT INTO public.users
-(id, email, "password", "name", "role", created_at, updated_at)
-VALUES(2, 'user@google.com', '$2a$10$sgZdzhFGSTsXnsTtE3lNW.VUivLy8UrKQOIPE6UecFZ8A8XhiLEKu', 'user', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182');
-ALTER SEQUENCE users_id_seq RESTART WITH 3;
+INSERT INTO users
+    (id, email, "password", "name", "role", created_at, updated_at)
+VALUES
+    (1, 'admin@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'admin', 'ADMIN', '2025-12-31 15:25:40.063', '2025-12-31 15:25:40.063'),
+    (2, 'user2@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user2', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
+    (3, 'user3@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user3', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
+    (4, 'user4@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user4', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
+    (5, 'user5@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user5', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
+    (6, 'user6@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user6', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
+    (7, 'user7@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user7', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
+    (8, 'user8@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user8', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
+    (9, 'user9@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user9', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
+    (10, 'user10@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user10', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182'),
+    (11, 'user11@gmail.com', '$2a$10$eMIiZEDWP/VP..RbWoxx/OJry2s7hlsem5jv8tZQ5N7OXY3jpQkt2', 'user11', 'USER', '2025-12-31 15:25:57.182', '2025-12-31 15:25:57.182');
+
+
+ALTER SEQUENCE users_id_seq RESTART WITH 12;

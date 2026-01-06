@@ -24,6 +24,3 @@ COMMENT ON COLUMN files.extension IS '확장자';
 COMMENT ON COLUMN files.path IS '저장 경로';
 COMMENT ON COLUMN files.created_at IS '생성일시';
 COMMENT ON COLUMN files.created_by IS '생성자';
-
--- 인덱스 추가 (조회 성능 향상)
-CREATE INDEX idx_files_ref ON files (ref_table, ref_id);
