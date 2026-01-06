@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @Profile("!local-inmemory")
-@EnableRedisHttpSession
 public class RedisConfig {
 
     @Bean

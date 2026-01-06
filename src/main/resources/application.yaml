@@ -23,3 +23,8 @@ logging:
 
 file:
   upload-dir: C:/uploads/
+
+server:
+  servlet:
+    session:
+      timeout: 30m
