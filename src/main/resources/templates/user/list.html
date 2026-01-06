@@ -29,15 +29,16 @@
         <!-- Search Form -->
         <div class="row mb-3">
             <div class="col-12 col-md-6">
-                <div class="input-group">
-                    <select class="form-select" id="searchType" style="max-width: 150px;">
-                        <option value="all">전체</option>
-                        <option value="name">이름</option>
-                        <option value="email">이메일</option>
+                <form action="/users" method="get" class="input-group">
+                    <select class="form-select" name="searchType" th:value="${searchType}" style="max-width: 150px;">
+                        <option value="all" th:selected="${searchType == 'all'}">전체</option>
+                        <option value="name" th:selected="${searchType == 'name'}">이름</option>
+                        <option value="email" th:selected="${searchType == 'email'}">이메일</option>
                     </select>
-                    <input type="text" class="form-control" id="keyword" placeholder="검색어를 입력하세요">
-                    <button class="btn btn-primary" type="button" id="btnSearch">검색</button>
-                </div>
+                    <input type="text" class="form-control" name="keyword" th:value="${keyword}"
+                        placeholder="검색어를 입력하세요">
+                    <button class="btn btn-primary" type="submit">검색</button>
+                </form>
             </div>
         </div>
 
@@ -54,13 +55,53 @@
                         <th>Updated At</th>
                     </tr>
                 </thead>
-                <tbody id="userTableBody">
+                <tbody>
+                    <tr th:each="user : ${data.list}" th:onclick="'location.href=\'/users/form?id=' + ${user.id} + '\''"
+                        style="cursor:pointer;">
+                        <td th:text="${user.id}">1</td>
+                        <td th:text="${user.email}">email@example.com</td>
+                        <td sec:authorize="hasRole('ADMIN')" th:text="${user.password}">***</td>
+                        <td th:text="${user.name}">Name</td>
+                        <td th:text="${user.role}">USER</td>
+                        <td th:text="${#dates.format(user.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01</td>
+                        <td th:text="${#dates.format(user.updatedAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(data.list)}">
+                        <td colspan="7" class="text-center">데이터가 없습니다.</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
 
         <!-- Pagination Controls -->
-        <div id="pagination" class="mt-4 text-center">
+        <div th:if="${data.totalPages > 1}" class="mt-4 text-center">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous -->
+                    <li class="page-item" th:classappend="${data.currentPage == 1} ? 'disabled'">
+                        <a class="page-link"
+                            th:href="@{/users(page=${data.currentPage - 1}, keyword=${keyword}, searchType=${searchType})}"
+                            th:onclick="'loadUsers(' + ${data.currentPage - 1} + '); return false;'">&laquo;</a>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    <li class="page-item" th:each="i : ${#numbers.sequence(
+                            data.currentPage - 2 < 1 ? 1 : data.currentPage - 2, 
+                            data.currentPage + 2 > data.totalPages ? data.totalPages : data.currentPage + 2)}"
+                        th:classappend="${i == data.currentPage} ? 'active'">
+                        <a class="page-link"
+                            th:href="@{/users(page=${i}, keyword=${keyword}, searchType=${searchType})}"
+                            th:onclick="'loadUsers(' + ${i} + '); return false;'" th:text="${i}">1</a>
+                    </li>
+
+                    <!-- Next -->
+                    <li class="page-item" th:classappend="${data.currentPage == data.totalPages} ? 'disabled'">
+                        <a class="page-link"
+                            th:href="@{/users(page=${data.currentPage + 1}, keyword=${keyword}, searchType=${searchType})}"
+                            th:onclick="'loadUsers(' + ${data.currentPage + 1} + '); return false;'">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 
@@ -73,151 +114,136 @@
     </script>
     <script>
         $(() => {
-            // CSRF handled by common.js
-
-            let currentPage = 1;
-            const pageSize = 10;
-
-            const renderPagination = (totalPages, currentPage) => {
-                const paginationDiv = $('#pagination');
-                paginationDiv.empty();
-
-                if (totalPages <= 1) return;
-
-                const nav = $('<nav aria-label="Page navigation">');
-                const ul = $('<ul class="pagination justify-content-center">');
-
-                // Previous Button
-                const prevLi = $('<li class="page-item">');
-                if (currentPage === 1) {
-                    prevLi.addClass('disabled');
-                    prevLi.append($('<span class="page-link">&laquo;</span>'));
-                } else {
-                    prevLi.append($(`<a class="page-link" href="#" data-page="${currentPage - 1}">&laquo;</a>`));
-                }
-                ul.append(prevLi);
-
-                // Page Numbers
-                const startPage = Math.max(1, currentPage - 2);
-                const endPage = Math.min(totalPages, currentPage + 2);
-
-                for (let i = startPage; i <= endPage; i++) {
-                    const li = $('<li class="page-item">');
-                    if (i === currentPage) {
-                        li.addClass('active');
-                        li.append($(`<span class="page-link">${i}</span>`));
-                    } else {
-                        li.append($(`<a class="page-link" href="#" data-page="${i}">${i}</a>`));
-                    }
-                    ul.append(li);
-                }
-
-                // Next Button
-                const nextLi = $('<li class="page-item">');
-                if (currentPage === totalPages) {
-                    nextLi.addClass('disabled');
-                    nextLi.append($('<span class="page-link">&raquo;</span>'));
-                } else {
-                    nextLi.append($(`<a class="page-link" href="#" data-page="${currentPage + 1}">&raquo;</a>`));
-                }
-                ul.append(nextLi);
-
-                nav.append(ul);
-                paginationDiv.append(nav);
-            };
-
-            // Function to load users
-            const loadUsers = (page = 1) => {
-                const keyword = $('#keyword').val();
-                const searchType = $('#searchType').val();
-
-                $.ajax({
-                    url: '/api/users/',
-                    type: 'GET',
-                    data: {
-                        page: page,
-                        size: pageSize,
-                        keyword: keyword,
-                        searchType: searchType
-                    },
-                    dataType: 'json',
-                    success: (response) => {
-                        const { list, totalPages, currentPage: responsePage } = response.data;
-
-                        const tableBody = $('#userTableBody');
-                        tableBody.empty();
-
-                        $.each(list, (index, user) => {
-                            const row = $('<tr>');
-                            row.attr('onclick', `location.href='/users/form?id=${user.id}'`);
-                            row.css('cursor', 'pointer');
-                            row.data('user', user);
-
-                            row.append($('<td>').text(user.id));
-                            row.append($('<td>').text(user.email));
-                            if (isAdmin) {
-                                row.append($('<td>').text(user.password));
-                            }
-                            row.append($('<td>').text(user.name));
-                            row.append($('<td>').text(user.role));
-                            row.append($('<td>').text(App.formatDate(user.createdAt)));
-                            row.append($('<td>').text(App.formatDate(user.updatedAt)));
-
-                            tableBody.append(row);
-                        });
-
-                        renderPagination(totalPages, responsePage);
-                    },
-                    error: (xhr) => {
-                        App.handleAjaxError(xhr, '데이터를 불러오는 중 오류가 발생했습니다.');
-                    }
-                });
-            };
-
-            // Initial load
-            loadUsers(currentPage);
-
-            // Search button click
-            $('#btnSearch').on('click', () => {
-                currentPage = 1;
-                loadUsers();
-            });
-
-            // Enter key in search input
-            $('#keyword').on('keypress', (e) => {
-                if (e.which == 13) {
-                    $('#btnSearch').click();
-                }
-            });
-
-            // Delete button click handler
-            $(document).on('click', '.btn-delete', function () {
-                if (!confirm('정말 삭제하시겠습니까?')) return;
-
-                const id = $(this).data('id');
-                $.ajax({
-                    url: `/api/users/${id}`,
-                    type: 'DELETE',
-                    success: () => {
-                        alert('삭제되었습니다.');
-                        loadUsers(currentPage);
-                    },
-                    error: (xhr) => {
-                        App.handleAjaxError(xhr, '삭제 중 오류가 발생했습니다.');
-                    }
-                });
-            });
-
-            // Pagination click handler
-            $(document).on('click', '.page-link', function (e) {
+            // 초기 로드 시 검색 폼의 submit 이벤트를 가로채서 API 호출로 변경
+            $('form.input-group').on('submit', function (e) {
                 e.preventDefault();
-                const page = $(this).data('page');
-                if (page) {
-                    currentPage = page;
-                    loadUsers(page);
-                }
+                loadUsers(1);
+            });
+
+            // 브라우저 뒤로가기/앞으로가기 이벤트 처리
+            window.addEventListener('popstate', function (event) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const page = urlParams.get('page') || 1;
+                const keyword = urlParams.get('keyword') || '';
+                const searchType = urlParams.get('searchType') || 'all';
+
+                // 폼 값 동기화
+                $('input[name="keyword"]').val(keyword);
+                $('select[name="searchType"]').val(searchType);
+
+                // 기록을 추가하지 않고 데이터만 로드
+                loadUsers(page, false);
             });
         });
+
+        function loadUsers(page, pushHistory = true) {
+            const keyword = $('input[name="keyword"]').val();
+            const searchType = $('select[name="searchType"]').val();
+
+            $.ajax({
+                url: '/api/users/',
+                type: 'GET',
+                data: {
+                    page: page,
+                    size: 10,
+                    keyword: keyword,
+                    searchType: searchType
+                },
+                success: function (response) {
+                    if (response.code === 'SUCCESS') {
+                        renderTable(response.data.list);
+                        renderPagination(response.data, keyword, searchType);
+
+                        // pushHistory가 true일 때만 URL 업데이트 (뒤로가기 시에는 false)
+                        if (pushHistory) {
+                            const newUrl = `/users?page=${page}&keyword=${keyword}&searchType=${searchType}`;
+                            window.history.pushState({ path: newUrl }, '', newUrl);
+                        }
+                    } else {
+                        alert('데이터를 불러오는데 실패했습니다.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.');
+                }
+            });
+        }
+
+        function renderTable(list) {
+            const tbody = $('tbody');
+            tbody.empty();
+
+            if (!list || list.length === 0) {
+                tbody.append('<tr><td colspan="7" class="text-center">데이터가 없습니다.</td></tr>');
+                return;
+            }
+
+            list.forEach(user => {
+                let row = `<tr onclick="location.href='/users/form?id=${user.id}'" style="cursor:pointer;">
+                    <td>${user.id}</td>
+                    <td>${user.email}</td>`;
+
+                if (isAdmin) {
+                    row += `<td>${user.password}</td>`;
+                }
+
+                row += `<td>${user.name}</td>
+                    <td>${user.role}</td>
+                    <td>${formatDate(user.createdAt)}</td>
+                    <td>${formatDate(user.updatedAt)}</td>
+                </tr>`;
+                tbody.append(row);
+            });
+        }
+
+        function renderPagination(data, keyword, searchType) {
+            const container = $('nav ul.pagination');
+            container.empty();
+
+            if (data.totalPages <= 1) return;
+
+            // Previous
+            const prevDisabled = data.currentPage === 1 ? 'disabled' : '';
+            container.append(`
+                <li class="page-item ${prevDisabled}">
+                    <a class="page-link" href="#" onclick="loadUsers(${data.currentPage - 1}); return false;">&laquo;</a>
+                </li>
+            `);
+
+            // Page Numbers
+            const startPage = Math.max(1, data.currentPage - 2);
+            const endPage = Math.min(data.totalPages, data.currentPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const active = i === data.currentPage ? 'active' : '';
+                container.append(`
+                    <li class="page-item ${active}">
+                        <a class="page-link" href="#" onclick="loadUsers(${i}); return false;">${i}</a>
+                    </li>
+                `);
+            }
+
+            // Next
+            const nextDisabled = data.currentPage === data.totalPages ? 'disabled' : '';
+            container.append(`
+                <li class="page-item ${nextDisabled}">
+                    <a class="page-link" href="#" onclick="loadUsers(${data.currentPage + 1}); return false;">&raquo;</a>
+                </li>
+            `);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
     </script>
 </body>
 

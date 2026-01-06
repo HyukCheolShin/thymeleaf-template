@@ -3,8 +3,11 @@ package com.example.template.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.example.template.common.dto.PageRequest;
+import com.example.template.service.UserService;
 
 /**
  * 화면 이동을 담당하는 컨트롤러
@@ -13,13 +16,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/users")
 public class UserController {
 
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
     @GetMapping("")
-    public String list() {
+    public String list(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "") String searchType,
+            Model model) {
+
+        var response = userService
+                .getAllUsers(new PageRequest(page, size, keyword, searchType));
+        model.addAttribute("data", response);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
+
         return "user/list";
     }
 
     @GetMapping("/form")
-    public String form(@org.springframework.web.bind.annotation.RequestParam(required = false) Long id, Model model) {
+    public String form(@RequestParam(required = false) Long id, Model model) {
         if (id != null) {
             model.addAttribute("id", id);
         }
