@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@Profile("redis")
+@Profile("!local-inmemory")
 @EnableRedisHttpSession
 public class RedisConfig {
 

@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: ENC(Bav0nZVGC8LWIFAP4Cpsgcc3mBkjuZAN4VxariXy4HQR7pqE42WvHFDAmYQbo2w0xttkfHEJcQ0=)
+    username: ENC(PSEk9njKgT3pkPA0ZMnC9EFJ/I/lejbc)
+    password: ENC(fYpG8QJTwikWxXsHWUyu8g==)
+    driver-class-name: org.postgresql.Driver
+  data:
+    redis:
+      host: ENC(nBhHPTB43jkGxv4cJ6YEigPXyayY5e/X)
+      port: ENC(AJ4p3TxS+59TVOjPgbJkuA==)
+      password: ENC(pZ0ADqWJ0eLK6NVqpicCdw==)
+  session:
+    redis:
+      namespace: template:session
+
+server:
+  servlet:
+    session:
+      cookie:
+        name: JSESSIONID
