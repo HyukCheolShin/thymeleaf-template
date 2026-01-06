@@ -93,9 +93,7 @@
             $('#btnDelete').on('click', () => {
                 if (!confirm('정말 삭제하시겠습니까?')) return;
 
-                App.api({
-                    url: `/api/users/${id}`,
-                    type: 'DELETE',
+                App.delete(`/api/users/${id}`, null, {
                     success: () => {
                         alert('삭제되었습니다.');
                         window.location.href = '/users';
@@ -104,13 +102,10 @@
             });
 
             const loadFiles = (refId) => {
-                App.api({
-                    url: '/api/files/',
-                    type: 'GET',
-                    data: {
-                        refTable: 'users',
-                        refId: refId
-                    },
+                App.get('/api/files/', {
+                    refTable: 'users',
+                    refId: refId
+                }, {
                     success: (response) => {
                         const files = response.data;
                         if (files && files.length > 0) {
@@ -143,9 +138,6 @@
                                 $('#attachmentContainer').hide();
                             }
                         }
-                    },
-                    error: (xhr) => {
-                        console.error('Failed to load files', xhr);
                     }
                 });
             };
@@ -156,23 +148,16 @@
                 if (!confirm("이 파일을 삭제하시겠습니까?")) return;
                 const fileId = $(this).data('id');
 
-                App.api({
-                    url: `/api/files/${fileId}`,
-                    type: 'DELETE',
+                App.delete(`/api/files/${fileId}`, null, {
                     success: () => {
                         alert('파일이 삭제되었습니다.');
                         loadFiles(id); // Reload list
-                    },
-                    error: (xhr) => {
-                        App.handleAjaxError(xhr, '파일 삭제 실패');
                     }
                 });
             });
 
             const loadUser = (userId) => {
-                App.api({
-                    url: `/api/users/${userId}`,
-                    type: 'GET',
+                App.get(`/api/users/${userId}`, null, {
                     success: (response) => {
                         const data = response.data;
                         $('#name').val(data.name);
@@ -182,9 +167,6 @@
 
                         // Load files
                         loadFiles(userId);
-                    },
-                    error: (xhr) => {
-                        App.handleAjaxError(xhr, '데이터 로딩 실패', true);
                     }
                 });
             };
@@ -234,9 +216,6 @@
                     success: () => {
                         alert(id ? '수정되었습니다.' : '저장되었습니다.');
                         window.location.href = '/users';
-                    },
-                    error: (xhr) => {
-                        App.handleAjaxError(xhr, id ? '수정 실패' : '저장 실패', false);
                     }
                 });
             });

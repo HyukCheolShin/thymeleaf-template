@@ -98,32 +98,21 @@
             const keyword = $('input[name="keyword"]').val();
             const searchType = $('select[name="searchType"]').val();
 
-            App.api({
-                url: '/api/users/',
-                type: 'GET',
-                data: {
-                    page: page,
-                    size: 10,
-                    keyword: keyword,
-                    searchType: searchType
-                },
+            App.get('/api/users/', {
+                page: page,
+                size: 10,
+                keyword: keyword,
+                searchType: searchType
+            }, {
                 success: function (response) {
-                    if (response.code === 'SUCCESS') {
-                        renderTable(response.data.list);
-                        App.renderPagination(response.data, keyword, searchType);
+                    renderTable(response.data.list);
+                    App.renderPagination(response.data, keyword, searchType);
 
-                        // pushHistory가 true일 때만 URL 업데이트 (뒤로가기 시에는 false)
-                        if (pushHistory) {
-                            const newUrl = `/users?page=${page}&keyword=${keyword}&searchType=${searchType}`;
-                            window.history.pushState({ path: newUrl }, '', newUrl);
-                        }
-                    } else {
-                        alert('데이터를 불러오는데 실패했습니다.');
+                    // pushHistory가 true일 때만 URL 업데이트 (뒤로가기 시에는 false)
+                    if (pushHistory) {
+                        const newUrl = `/users?page=${page}&keyword=${keyword}&searchType=${searchType}`;
+                        window.history.pushState({ path: newUrl }, '', newUrl);
                     }
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error:', error);
-                    alert('오류가 발생했습니다.');
                 }
             });
         }

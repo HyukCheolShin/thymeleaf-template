@@ -11,15 +11,17 @@
 ### Backend
 - **Language**: Java 21
 - **Framework**: Spring Boot 3.5.9
-- **Database**: PostgreSQL (Driver included)
+- **Database**: PostgreSQL
 - **ORM**: MyBatis 3.0.5
-- **Cache/Session**: Redis (Spring Session)
+- **Session**: Redis
 - **Security**: Spring Security 6
-- **Template Engine**: Thymeleaf (with Security Extras)
+- **Template Engine**: Thymeleaf
 - **Build Tool**: Maven
 
 ### Frontend
 - **HTML/CSS/JS**: Vanilla (Thymeleaf Integration)
+- **Library**: jQuery 3.7.1
+- **UI Framework**: Bootstrap 5
 
 ---
 
@@ -28,14 +30,14 @@
 ```
 com.example.template
 ├── common                  # 공통 모듈
-│   ├── dto                 # 공통 DTO (ApiResponse 등)
-│   ├── exception           # 전역 예외 처리 (GlobalExceptionHandler)
-│   ├── interceptor         # 웹 인터셉터 (LoggingInterceptor)
+│   ├── dto                 # 공통 DTO
+│   ├── exception           # 전역 예외 처리
+│   ├── interceptor         # 웹 인터셉터
 │   └── map                 # MyBatis용 맵핑 클래스
 ├── config                  # 설정 클래스
-│   ├── RedisConfig.java    # Redis 및 세션 직렬화 설정 (JSON)
+│   ├── RedisConfig.java    # Redis 및 세션 직렬화 설정
 │   ├── SecurityConfig.java # Spring Security 설정
-│   └── WebMvcConfig.java   # Web MVC 설정 (Interceptor 등록)
+│   └── WebMvcConfig.java   # Web MVC 설정
 ├── controller              # 웹 컨트롤러
 ├── service                 # 비즈니스 로직
 ├── mapper                  # MyBatis 매퍼 인터페이스
@@ -44,18 +46,17 @@ com.example.template
 
 ---
 
-## 4. Configuration & Profiles
+## 4. Key Features
 
-### `application.yaml`
-- **Profiles**:
-    - `default`: 기본 설정 (DB 연결 등)
-    - `redis`: Redis 세션 사용 시 활성화 필요
-- **Database**:
-    - URL: `jdbc:postgresql://localhost:5432/postgres`
-    - Username/Password: `postgres` / `1234`
-- **Redis**:
-    - Host/Port: `localhost:6379`
-    - Session Serializer: JSON (가독성 확보)
+### 4.1. User Management
+- 사용자 목록, 상세 조회, 수정, 삭제 기능 구현 (CRUD)
+- Thymeleaf + Bootstrap 5 기반의 반응형 UI
+- 검색 및 페이징 처리
+
+### 4.2. Security & Session
+- **Spring Security**: 로그인/로그아웃, BCrypt 패스워드 암호화
+- **Redis Session**: 세션 정보를 Redis에 **JSON** 포맷으로 저장 (가독성 확보)
+- **CSRF Protection**: 모든 POST/PUT/DELETE 요청에 CSRF 토큰 검증 필수
 
 ---
 
@@ -67,15 +68,29 @@ com.example.template
 - **DB Table/Column**: snake_case (e.g., `user_info`)
 - **URL**: kebab-case (e.g., `/api/user-profiles`)
 
-### 5.2. Exception Handling
-- 모든 예외는 `GlobalExceptionHandler`에서 처리됩니다.
-- 비즈니스 로직에서 예외 발생 시 `IllegalArgumentException` 또는 커스텀 예외를 throw 하십시오.
-- 클라이언트 응답 포맷: `ApiResponse<T>`
+### 5.2. Architecture Flow
+`Controller` -> `Service` -> `Mapper` -> `Database`
+- **Controller**: 요청 검증 및 응답 반환 (`ApiResponse` 사용 권장)
+- **Service**: 비즈니스 로직 및 트랜잭션 처리 (`@Transactional`)
+- **Mapper**: DB 쿼리 실행 (MyBatis XML)
 
-### 5.3. Session Management
-- **Redis**를 세션 저장소로 사용합니다.
-- `redis` 프로필이 활성화되어야 동작합니다.
-- 모든 세션 데이터는 **JSON**으로 직렬화되어 저장되므로 `redis-cli`에서 가독성이 보장됩니다.
+### 5.3. Exception Handling
+- 모든 예외는 `GlobalExceptionHandler`에서 중앙 처리됩니다.
+- 비즈니스 로직 예외는 `IllegalArgumentException` 또는 커스텀 예외를 사용하세요.
+
+### 5.4. Frontend (Thymeleaf & JS)
+- **Layout**: `nav.html`, `head.html` 등 공통 프래그먼트 재사용 (`th:replace`)
+### 5.4. Frontend (Thymeleaf & JS)
+- **Modules**: `JS` 파일이 역할별로 분리되어 있습니다.
+  - `api.js`: API 호출 및 공통 에러 핸들링 (App.api)
+  - `utils.js`: 유틸리티 함수 (날짜 포맷 등)
+  - `ui.js`: UI 관련 함수 (페이징 등)
+- **AJAX**: `api.js`에 정의된 `App` 헬퍼 메소드를 사용하세요.
+  - **GET**: `App.get(url, params, { success: fn })`
+  - **POST**: `App.post(url, data, { success: fn })` (JSON 자동 변환)
+  - **PUT**: `App.put(url, data, { success: fn })`
+  - **DELETE**: `App.delete(url, data, { success: fn })`
+  - *Response Code 체크(`if(res.code==='SUCCESS')`)는 내부에서 자동 처리되므로, 성공 로직만 작성하면 됩니다.*
 
 ---
 
@@ -94,12 +109,3 @@ com.example.template
 # Redis 프로필 활성화 실행 (세션 연동 시 필수)
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=redis
 ```
-
----
-
-## 7. Troubleshooting
-
-### Redis Serialization Issue
-- **증상**: `redis-cli` 조회 시 문자가 깨져 보임.
-- **해결**: `RedisConfig`에 `GenericJackson2JsonRedisSerializer`가 적용되어 있는지 확인하십시오.
-- **주의**: 직렬화 방식 변경 후 반드시 `redis-cli flushall`로 기존 데이터를 날려야 에러가 발생하지 않습니다.
