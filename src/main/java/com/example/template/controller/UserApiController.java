@@ -17,15 +17,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserApiController {
 
     private final UserService userService;
-
-    public UserApiController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping("/")
     public ApiResponse<PageResponse<Map<String, Object>>> getAllUsers(

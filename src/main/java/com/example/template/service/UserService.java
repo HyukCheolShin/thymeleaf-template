@@ -19,18 +19,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.Collection;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final FileService fileService;
-
-    public UserService(UserMapper userMapper, PasswordEncoder passwordEncoder, FileService fileService) {
-        this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
-        this.fileService = fileService;
-    }
 
     public PageResponse<Map<String, Object>> getAllUsers(PageRequest pageRequest) {
         Map<String, Object> params = Map.of(

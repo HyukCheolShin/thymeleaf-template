@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class FileService {
 
@@ -123,7 +126,7 @@ public class FileService {
                 Files.deleteIfExists(filePath);
             } catch (IOException ex) {
                 // Log warning but continue deleting other files
-                System.err.println("Could not delete file " + saveName + ": " + ex.getMessage());
+                log.error("Could not delete file {}: {}", saveName, ex.getMessage());
             }
         }
 

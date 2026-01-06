@@ -12,15 +12,14 @@ import java.util.Map;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/files")
+@RequiredArgsConstructor
 public class FileApiController {
 
     private final FileService fileService;
-
-    public FileApiController(FileService fileService) {
-        this.fileService = fileService;
-    }
 
     @PostMapping("/upload")
     public ApiResponse<Void> uploadFile(
