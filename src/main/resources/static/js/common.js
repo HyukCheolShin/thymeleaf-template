@@ -47,6 +47,49 @@ const App = {
         const date = new Date(dateString);
         const pad = (num) => String(num).padStart(2, '0');
         return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    },
+
+    /**
+     * Render pagination controls
+     * @param {Object} data - PageResponse object
+     * @param {String} keyword - Search keyword
+     * @param {String} searchType - Search type
+     * @param {String} jsFunction - JS function to call on click (default: 'loadUsers')
+     */
+    renderPagination(data, keyword, searchType, jsFunction = 'loadUsers') {
+        const container = $('nav ul.pagination');
+        container.empty();
+
+        if (data.totalPages <= 1) return;
+
+        // Previous
+        const prevDisabled = data.currentPage === 1 ? 'disabled' : '';
+        container.append(`
+            <li class="page-item ${prevDisabled}">
+                <a class="page-link" href="#" onclick="${jsFunction}(${data.currentPage - 1}); return false;">&laquo;</a>
+            </li>
+        `);
+
+        // Page Numbers
+        const startPage = Math.max(1, data.currentPage - 2);
+        const endPage = Math.min(data.totalPages, data.currentPage + 2);
+
+        for (let i = startPage; i <= endPage; i++) {
+            const active = i === data.currentPage ? 'active' : '';
+            container.append(`
+                <li class="page-item ${active}">
+                    <a class="page-link" href="#" onclick="${jsFunction}(${i}); return false;">${i}</a>
+                </li>
+            `);
+        }
+
+        // Next
+        const nextDisabled = data.currentPage === data.totalPages ? 'disabled' : '';
+        container.append(`
+            <li class="page-item ${nextDisabled}">
+                <a class="page-link" href="#" onclick="${jsFunction}(${data.currentPage + 1}); return false;">&raquo;</a>
+            </li>
+        `);
     }
 };
 

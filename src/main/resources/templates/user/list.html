@@ -74,35 +74,8 @@
         </div>
 
         <!-- Pagination Controls -->
-        <div th:if="${data.totalPages > 1}" class="mt-4 text-center">
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
-                    <!-- Previous -->
-                    <li class="page-item" th:classappend="${data.currentPage == 1} ? 'disabled'">
-                        <a class="page-link"
-                            th:href="@{/users(page=${data.currentPage - 1}, keyword=${keyword}, searchType=${searchType})}"
-                            th:onclick="'loadUsers(' + ${data.currentPage - 1} + '); return false;'">&laquo;</a>
-                    </li>
-
-                    <!-- Page Numbers -->
-                    <li class="page-item" th:each="i : ${#numbers.sequence(
-                            data.currentPage - 2 < 1 ? 1 : data.currentPage - 2, 
-                            data.currentPage + 2 > data.totalPages ? data.totalPages : data.currentPage + 2)}"
-                        th:classappend="${i == data.currentPage} ? 'active'">
-                        <a class="page-link"
-                            th:href="@{/users(page=${i}, keyword=${keyword}, searchType=${searchType})}"
-                            th:onclick="'loadUsers(' + ${i} + '); return false;'" th:text="${i}">1</a>
-                    </li>
-
-                    <!-- Next -->
-                    <li class="page-item" th:classappend="${data.currentPage == data.totalPages} ? 'disabled'">
-                        <a class="page-link"
-                            th:href="@{/users(page=${data.currentPage + 1}, keyword=${keyword}, searchType=${searchType})}"
-                            th:onclick="'loadUsers(' + ${data.currentPage + 1} + '); return false;'">&raquo;</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+        <!-- Pagination Controls -->
+        <div th:replace="~{common/pagination :: pagination(${data})}"></div>
     </div>
 
     </div>
@@ -152,7 +125,7 @@
                 success: function (response) {
                     if (response.code === 'SUCCESS') {
                         renderTable(response.data.list);
-                        renderPagination(response.data, keyword, searchType);
+                        App.renderPagination(response.data, keyword, searchType);
 
                         // pushHistory가 true일 때만 URL 업데이트 (뒤로가기 시에는 false)
                         if (pushHistory) {
@@ -190,60 +163,14 @@
 
                 row += `<td>${user.name}</td>
                     <td>${user.role}</td>
-                    <td>${formatDate(user.createdAt)}</td>
-                    <td>${formatDate(user.updatedAt)}</td>
+                    <td>${App.formatDate(user.createdAt)}</td>
+                    <td>${App.formatDate(user.updatedAt)}</td>
                 </tr>`;
                 tbody.append(row);
             });
         }
 
-        function renderPagination(data, keyword, searchType) {
-            const container = $('nav ul.pagination');
-            container.empty();
 
-            if (data.totalPages <= 1) return;
-
-            // Previous
-            const prevDisabled = data.currentPage === 1 ? 'disabled' : '';
-            container.append(`
-                <li class="page-item ${prevDisabled}">
-                    <a class="page-link" href="#" onclick="loadUsers(${data.currentPage - 1}); return false;">&laquo;</a>
-                </li>
-            `);
-
-            // Page Numbers
-            const startPage = Math.max(1, data.currentPage - 2);
-            const endPage = Math.min(data.totalPages, data.currentPage + 2);
-
-            for (let i = startPage; i <= endPage; i++) {
-                const active = i === data.currentPage ? 'active' : '';
-                container.append(`
-                    <li class="page-item ${active}">
-                        <a class="page-link" href="#" onclick="loadUsers(${i}); return false;">${i}</a>
-                    </li>
-                `);
-            }
-
-            // Next
-            const nextDisabled = data.currentPage === data.totalPages ? 'disabled' : '';
-            container.append(`
-                <li class="page-item ${nextDisabled}">
-                    <a class="page-link" href="#" onclick="loadUsers(${data.currentPage + 1}); return false;">&raquo;</a>
-                </li>
-            `);
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        }
     </script>
 </body>
 
