@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8" />
@@ -19,7 +19,7 @@
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit" class="btn btn-secondary me-2">Logout</button>
             </form>
-            <a href="/users/form" class="btn btn-primary">Add User</a>
+            <a href="/users/form" class="btn btn-primary" sec:authorize="hasRole('ADMIN')">Add User</a>
         </div>
     </div>
 
@@ -44,7 +44,7 @@
             <tr>
                 <th>ID</th>
                 <th>Email</th>
-                <th>Password</th>
+                <th sec:authorize="hasRole('ADMIN')">Password</th>
                 <th>Name</th>
                 <th>Role</th>
                 <th>Created At</th>
@@ -59,6 +59,11 @@
     <div id="pagination" style="margin-top: 20px; text-align: center;">
     </div>
 
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const isAdmin = /*[[${#authorization.expression('hasRole(''ADMIN'')')}]]*/ false;
+        /*]]>*/
+    </script>
     <script>
         $(() => {
             // CSRF handled by common.js
@@ -125,7 +130,9 @@
 
                             row.append($('<td>').text(user.id));
                             row.append($('<td>').text(user.email));
-                            row.append($('<td>').text(user.password));
+                            if (isAdmin) {
+                                row.append($('<td>').text(user.password));
+                            }
                             row.append($('<td>').text(user.name));
                             row.append($('<td>').text(user.role));
                             row.append($('<td>').text(App.formatDate(user.createdAt)));

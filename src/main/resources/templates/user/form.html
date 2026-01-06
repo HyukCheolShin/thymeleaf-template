@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <link rel="stylesheet" href="/css/style.css">
@@ -30,7 +30,7 @@
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" required>
             </div>
-            <div class="mb-3">
+            <div class="mb-3" sec:authorize="hasRole('ADMIN')">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="password" required>
             </div>
@@ -50,8 +50,10 @@
 
             <div id="buttonGroup">
                 <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
-                <button type="button" class="btn btn-primary" id="btnEdit" style="display:none;">Edit</button>
-                <button type="button" class="btn btn-danger" id="btnDelete" style="display:none;">Delete</button>
+                <button type="button" class="btn btn-primary" id="btnEdit" style="display:none;"
+                    sec:authorize="hasRole('ADMIN')">Edit</button>
+                <button type="button" class="btn btn-danger" id="btnDelete" style="display:none;"
+                    sec:authorize="hasRole('ADMIN')">Delete</button>
                 <button type="button" class="btn btn-secondary" onclick="location.href='/users'">Cancel</button>
             </div>
         </form>

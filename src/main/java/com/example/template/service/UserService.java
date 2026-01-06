@@ -13,8 +13,11 @@ import com.example.template.common.exception.ResourceNotFoundException;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
+import java.util.Collection;
 
 @Service
 public class UserService {
@@ -39,12 +42,28 @@ public class UserService {
         int totalItems = userMapper.count(params);
         List<Map<String, Object>> list = userMapper.findAll(params);
 
+        if (!isAdmin()) {
+            list.forEach(user -> user.remove("password"));
+        }
+
         return new PageResponse<>(list, totalItems, pageRequest.getSize(), pageRequest.getPage());
     }
 
     public Map<String, Object> getUserById(Long id) {
-        return Optional.ofNullable(userMapper.findById(id))
+        Map<String, Object> user = Optional.ofNullable(userMapper.findById(id))
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        if (!isAdmin()) {
+            user.remove("password");
+        }
+
+        return user;
+    }
+
+    private boolean isAdmin() {
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities();
+        return authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
     @Transactional
