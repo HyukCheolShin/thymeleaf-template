@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div th:fragment="pagination(data)">
+        <div class="mt-4 text-center pagination-container" th:style="${data.totalPages <= 1} ? 'display:none' : ''">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous -->
+                    <li class="page-item" th:classappend="${data.currentPage == 1} ? 'disabled'">
+                        <a class="page-link" href="#"
+                            th:onclick="'loadUsers(' + ${data.currentPage - 1} + '); return false;'">&laquo;</a>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    <li class="page-item" th:each="i : ${#numbers.sequence(
+                            data.currentPage - 2 < 1 ? 1 : data.currentPage - 2, 
+                            data.currentPage + 2 > data.totalPages ? data.totalPages : data.currentPage + 2)}"
+                        th:classappend="${i == data.currentPage} ? 'active'">
+                        <a class="page-link" href="#" th:onclick="'loadUsers(' + ${i} + '); return false;'"
+                            th:text="${i}">1</a>
+                    </li>
+
+                    <!-- Next -->
+                    <li class="page-item" th:classappend="${data.currentPage == data.totalPages} ? 'disabled'">
+                        <a class="page-link" href="#"
+                            th:onclick="'loadUsers(' + ${data.currentPage + 1} + '); return false;'">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</body>
+
+</html>

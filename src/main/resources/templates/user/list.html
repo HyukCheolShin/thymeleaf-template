@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{common/head :: head('User List')}"></head>
+
+<body>
+    <nav th:replace="~{common/nav :: nav}"></nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>User List</h2>
+            <div>
+                <a href="/users/form" class="btn btn-primary" sec:authorize="hasRole('ADMIN')">Add User</a>
+            </div>
+        </div>
+
+        <!-- Search Form -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-6">
+                <form action="/users" method="get" class="input-group">
+                    <select class="form-select" name="searchType" th:value="${searchType}" style="max-width: 150px;">
+                        <option value="all" th:selected="${searchType == 'all'}">전체</option>
+                        <option value="name" th:selected="${searchType == 'name'}">이름</option>
+                        <option value="email" th:selected="${searchType == 'email'}">이메일</option>
+                    </select>
+                    <input type="text" class="form-control" name="keyword" th:value="${keyword}"
+                        placeholder="검색어를 입력하세요">
+                    <button class="btn btn-primary" type="submit">검색</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th sec:authorize="hasRole('ADMIN')">Password</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${data.list}" th:onclick="'location.href=\'/users/form?id=' + ${user.id} + '\''"
+                        style="cursor:pointer;">
+                        <td th:text="${user.id}">1</td>
+                        <td th:text="${user.email}">email@example.com</td>
+                        <td sec:authorize="hasRole('ADMIN')" th:text="${user.password}">***</td>
+                        <td th:text="${user.name}">Name</td>
+                        <td th:text="${user.role}">USER</td>
+                        <td th:text="${#dates.format(user.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01</td>
+                        <td th:text="${#dates.format(user.updatedAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(data.list)}">
+                        <td colspan="7" class="text-center">데이터가 없습니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div th:replace="~{common/pagination :: pagination(${data})}"></div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const isAdmin = /*[[${#authorization.expression('hasRole(''ADMIN'')')}]]*/ false;
+        /*]]>*/
+    </script>
+    <script>
+        $(() => {
+            // 초기 로드 시 검색 폼의 submit 이벤트를 가로채서 API 호출로 변경
+            $('form.input-group').on('submit', function (e) {
+                e.preventDefault();
+                loadUsers(1);
+            });
+
+            // 브라우저 뒤로가기/앞으로가기 이벤트 처리
+            window.addEventListener('popstate', function (event) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const page = urlParams.get('page') || 1;
+                const keyword = urlParams.get('keyword') || '';
+                const searchType = urlParams.get('searchType') || 'all';
+
+                // 폼 값 동기화
+                $('input[name="keyword"]').val(keyword);
+                $('select[name="searchType"]').val(searchType);
+
+                // 기록을 추가하지 않고 데이터만 로드
+                loadUsers(page, false);
+            });
+        });
+
+        function loadUsers(page, pushHistory = true) {
+            const keyword = $('input[name="keyword"]').val();
+            const searchType = $('select[name="searchType"]').val();
+
+            App.get('/api/users/', {
+                page: page,
+                size: 10,
+                keyword: keyword,
+                searchType: searchType
+            }, {
+                success: function (response) {
+                    renderTable(response.data.list);
+                    App.renderPagination(response.data);
+
+                    // pushHistory가 true일 때만 URL 업데이트 (뒤로가기 시에는 false)
+                    if (pushHistory) {
+                        const newUrl = `/users?page=${page}&keyword=${keyword}&searchType=${searchType}`;
+                        window.history.pushState({ path: newUrl }, '', newUrl);
+                    }
+                }
+            });
+        }
+
+        function renderTable(list) {
+            const tbody = $('tbody');
+            tbody.empty();
+
+            if (!list || list.length === 0) {
+                tbody.append('<tr><td colspan="7" class="text-center">데이터가 없습니다.</td></tr>');
+                return;
+            }
+
+            list.forEach(user => {
+                let row = `<tr onclick="location.href='/users/form?id=${user.id}'" style="cursor:pointer;">
+                    <td>${user.id}</td>
+                    <td>${user.email}</td>`;
+
+                if (isAdmin) {
+                    row += `<td>${user.password}</td>`;
+                }
+
+                row += `<td>${user.name}</td>
+                    <td>${user.role}</td>
+                    <td>${App.formatDate(user.createdAt)}</td>
+                    <td>${App.formatDate(user.updatedAt)}</td>
+                </tr>`;
+                tbody.append(row);
+            });
+        }
+
+
+    </script>
+</body>
+
+</html>

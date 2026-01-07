@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{common/head :: head(${id == null ? 'Add User' : 'Read User'})}"></head>
+
+<body>
+    <nav th:replace="~{common/nav :: nav}"></nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 id="pageTitle" th:text="${id == null ? 'Add User' : 'Read User'}">User Form</h2>
+        </div>
+
+        <form id="userForm">
+            <input type="hidden" id="id" th:value="${id}">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3" sec:authorize="hasRole('ADMIN')">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" required>
+            </div>
+            <div class="mb-3">
+                <label for="role" class="form-label">Role</label>
+                <select class="form-select" id="role">
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+            </div>
+            <div class="mb-3" id="attachmentContainer">
+                <label class="form-label">Attachments</label>
+                <div id="fileUploadArea">
+                    <input type="file" class="form-control" id="file" name="file">
+                </div>
+            </div>
+
+            <div id="buttonGroup">
+                <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
+                <button type="button" class="btn btn-primary" id="btnEdit" style="display:none;"
+                    sec:authorize="hasRole('ADMIN')">Edit</button>
+                <button type="button" class="btn btn-danger" id="btnDelete" style="display:none;"
+                    sec:authorize="hasRole('ADMIN')">Delete</button>
+                <button type="button" class="btn btn-secondary" id="btnCancel" onclick="history.back()">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        $(() => {
+            const id = $('#id').val();
+
+            // Function to set read-only mode
+            const setReadOnly = (isReadOnly) => {
+                $('#userForm input:not([type="hidden"]), #userForm select').prop('disabled', isReadOnly);
+
+                if (isReadOnly) {
+                    $('#btnSave').hide();
+                    $('#btnEdit').show();
+                    $('#btnDelete').show();
+                    $('#file').hide(); // Hide file input in read-only
+                    $('.btn-file-delete').hide(); // Hide file delete buttons
+
+                    if ($('#fileList').children().length === 0) {
+                        $('#attachmentContainer').hide();
+                    }
+
+                    $('#pageTitle').text('Read User');
+                    $('#btnCancel').text('Back');
+                } else {
+                    $('#btnSave').show();
+                    $('#btnEdit').hide();
+                    $('#btnDelete').hide();
+                    $('#file').show(); // Show file input in edit mode
+                    $('#attachmentContainer').show();
+                    $('.btn-file-delete').show(); // Show file delete buttons
+
+                    if (id) {
+                        $('#pageTitle').text('Edit User');
+                        $('#btnCancel').text('Cancel');
+                    } else {
+                        $('#pageTitle').text('Add User');
+                        $('#btnCancel').text('Cancel');
+                    }
+                }
+            };
+
+            // Delete Button Click
+            $('#btnDelete').on('click', () => {
+                if (!confirm('정말 삭제하시겠습니까?')) return;
+
+                App.delete(`/api/users/${id}`, null, {
+                    success: () => {
+                        alert('삭제되었습니다.');
+                        window.location.href = '/users';
+                    }
+                });
+            });
+
+            const loadFiles = (refId) => {
+                App.get('/api/files/', {
+                    refTable: 'users',
+                    refId: refId
+                }, {
+                    success: (response) => {
+                        const files = response.data;
+                        if (files && files.length > 0) {
+                            // Clean up existing list
+                            $('#fileList').remove();
+
+                            const $list = $('<ul id="fileList" class="list-group mt-2"></ul>');
+                            files.forEach(file => {
+                                const $li = $(`
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>
+                                            <a href="/api/files/download/${file.id}">${file.originalName}</a>
+                                            <span class="badge bg-secondary rounded-pill ms-2">${(file.size / 1024).toFixed(2)} KB</span>
+                                        </span>
+                                        <button type="button" class="btn btn-sm btn-danger btn-file-delete" data-id="${file.id}" style="display:none;">X</button>
+                                    </li>
+                                `);
+                                $list.append($li);
+                            });
+
+                            $('#fileUploadArea').append($list);
+
+                            if ($('#btnSave').is(':visible')) {
+                                $('.btn-file-delete').show();
+                            }
+                            $('#attachmentContainer').show();
+                        } else {
+                            $('#fileList').remove(); // Ensure list is removed if no files
+                            if ($('#file').is(':hidden')) {
+                                $('#attachmentContainer').hide();
+                            }
+                        }
+                    }
+                });
+            };
+
+            // File Delete Button Click
+            $(document).on('click', '.btn-file-delete', function (e) {
+                e.preventDefault();
+                if (!confirm("이 파일을 삭제하시겠습니까?")) return;
+                const fileId = $(this).data('id');
+
+                App.delete(`/api/files/${fileId}`, null, {
+                    success: () => {
+                        alert('파일이 삭제되었습니다.');
+                        loadFiles(id); // Reload list
+                    }
+                });
+            });
+
+            const loadUser = (userId) => {
+                App.get(`/api/users/${userId}`, null, {
+                    success: (response) => {
+                        const data = response.data;
+                        $('#name').val(data.name);
+                        $('#email').val(data.email);
+                        $('#password').val(data.password);
+                        $('#role').val(data.role);
+
+                        // Load files
+                        loadFiles(userId);
+                    }
+                });
+            };
+
+            // Initialization
+            if (id) {
+                // Edit Mode: Load data and set Read-Only
+                loadUser(id);
+                setReadOnly(true);
+            } else {
+                // Create Mode: Editable
+                setReadOnly(false);
+            }
+
+            // Edit Button Click
+            $('#btnEdit').on('click', () => {
+                setReadOnly(false);
+            });
+
+            // Save Form
+            $('#userForm').on('submit', (e) => {
+                e.preventDefault();
+
+                // If creating (No ID), use POST with FormData (Transactional)
+                const formData = new FormData();
+                formData.append('name', $('#name').val());
+                formData.append('email', $('#email').val());
+                formData.append('password', $('#password').val());
+                formData.append('role', $('#role').val());
+
+                const fileInput = $('#file')[0];
+                if (fileInput.files.length > 0) {
+                    formData.append('file', fileInput.files[0]);
+                }
+
+                let url = '/api/users/';
+                if (id) {
+                    url += id;
+                }
+
+                App.api({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: () => {
+                        alert(id ? '수정되었습니다.' : '저장되었습니다.');
+                        window.location.href = '/users';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
