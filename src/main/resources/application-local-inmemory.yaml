@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: ENC(Bav0nZVGC8LWIFAP4Cpsgcc3mBkjuZAN4VxariXy4HQR7pqE42WvHFDAmYQbo2w0xttkfHEJcQ0=)
+    username: ENC(PSEk9njKgT3pkPA0ZMnC9EFJ/I/lejbc)
+    password: ENC(fYpG8QJTwikWxXsHWUyu8g==)
+    driver-class-name: org.postgresql.Driver
+  autoconfigure:
+    exclude: 
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      
