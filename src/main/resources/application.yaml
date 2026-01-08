@@ -17,12 +17,7 @@ mybatis:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
     call-setters-on-nulls: true
 
-logging:
-  level:
-    com.example.template.mapper: DEBUG
 
-file:
-  upload-dir: C:/uploads/
 
 server:
   servlet:
