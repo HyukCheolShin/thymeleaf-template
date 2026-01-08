@@ -10,4 +10,4 @@ spring:
       - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
 
 file:
-  upload-dir: C:/template/uploads/
+  upload-dir: C:/apps/template/uploads/
