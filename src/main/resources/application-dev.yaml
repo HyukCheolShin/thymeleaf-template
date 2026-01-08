@@ -20,4 +20,4 @@ server:
         name: JSESSIONID
 
 file:
-  upload-dir: /opt/template/uploads/
+  upload-dir: ${user.home}/apps/template/uploads/

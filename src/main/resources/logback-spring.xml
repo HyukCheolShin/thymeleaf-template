@@ -5,7 +5,7 @@
 
     <!-- 변수 설정 -->
     <springProfile name="dev,stg,prd">
-        <property name="LOG_PATH" value="/opt/template/logs"/>
+        <property name="LOG_PATH" value="${user.home}/apps/template/logs"/>
     </springProfile>
 
     <property name="LOG_FILE" value="${LOG_PATH}/application.log"/>
