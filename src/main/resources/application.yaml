@@ -1,8 +1,35 @@
 spring:
   application:
     name: thymeleaf-template
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}  # 환경 변수로 프로파일 지정, 기본값은 local
   datasource:
-    url: jdbc:postgresql://192.168.56.6:5432/template
+    url: jdbc:postgresql://localhost:5432/template
     username: template_user
     password: template_pwd
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.example.thymeleaf_template.**.model
+  configuration:
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: NULL
+    default-statement-timeout: 30
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+logging:
+  level:
+    root: INFO
+    p6spy: INFO
+    org.springframework.jdbc: WARN
+    com.example.thymeleaf_template: DEBUG
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+      logging: slf4j
