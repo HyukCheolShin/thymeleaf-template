@@ -21,3 +21,9 @@ server:
 
 file:
   upload-dir: C:/apps/template/uploads/
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+      multiline: true

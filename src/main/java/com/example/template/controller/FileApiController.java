@@ -1,6 +1,6 @@
 package com.example.template.controller;
 
-import com.example.template.common.dto.ApiResponse;
+import com.example.template.common.dto.ApiResponseDto;
 import com.example.template.service.FileService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -22,20 +22,20 @@ public class FileApiController {
     private final FileService fileService;
 
     @PostMapping("/upload")
-    public ApiResponse<Void> uploadFile(
+    public ApiResponseDto<Void> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("refTable") String refTable,
             @RequestParam("refId") Long refId) {
 
         fileService.uploadFile(file, refTable, refId);
-        return ApiResponse.success();
+        return ApiResponseDto.success();
     }
 
     @GetMapping("/")
-    public ApiResponse<Object> getFiles(
+    public ApiResponseDto<Object> getFiles(
             @RequestParam String refTable,
             @RequestParam Long refId) {
-        return ApiResponse.success(fileService.getFiles(refTable, refId));
+        return ApiResponseDto.success(fileService.getFiles(refTable, refId));
     }
 
     @GetMapping("/download/{id}")
@@ -62,8 +62,8 @@ public class FileApiController {
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> deleteFile(@PathVariable Long id) {
+    public ApiResponseDto<Void> deleteFile(@PathVariable Long id) {
         fileService.deleteFile(id);
-        return ApiResponse.success();
+        return ApiResponseDto.success();
     }
 }

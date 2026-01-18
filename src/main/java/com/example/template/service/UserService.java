@@ -1,8 +1,8 @@
 package com.example.template.service;
 
 import com.example.template.mapper.UserMapper;
-import com.example.template.common.dto.PageRequest;
-import com.example.template.common.dto.PageResponse;
+import com.example.template.common.dto.PageRequestDto;
+import com.example.template.common.dto.PageResponseDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final FileService fileService;
 
-    public PageResponse<Map<String, Object>> getAllUsers(PageRequest pageRequest) {
+    public PageResponseDto<Map<String, Object>> getAllUsers(PageRequestDto pageRequest) {
         Map<String, Object> params = Map.of(
                 "limit", pageRequest.getSize(),
                 "offset", pageRequest.getOffset(),
@@ -45,7 +45,7 @@ public class UserService {
             list.forEach(user -> user.remove("password"));
         }
 
-        return new PageResponse<>(list, totalItems, pageRequest.getSize(), pageRequest.getPage());
+        return new PageResponseDto<>(list, totalItems, pageRequest.getSize(), pageRequest.getPage());
     }
 
     public Map<String, Object> getUserById(Long id) {
