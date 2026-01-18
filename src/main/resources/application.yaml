@@ -17,8 +17,6 @@ mybatis:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
     call-setters-on-nulls: true
 
-
-
 server:
   servlet:
     session:

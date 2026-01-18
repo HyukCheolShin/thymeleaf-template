@@ -1,4 +1,4 @@
-package com.example.template.config.auth;
+package com.example.template.common.config.auth;
 
 import com.example.template.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
