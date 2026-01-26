@@ -10,12 +10,6 @@ spring:
   jackson:
     time-zone: Asia/Seoul
 
-mybatis:
-  type-aliases-package: kr.co.aia.ipro.common.map
-  mapper-locations: classpath:mapper/**/*.xml
-  configuration:
-    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
-    call-setters-on-nulls: true
 
 server:
   servlet:
