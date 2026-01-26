@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.template.common.dto.PageRequest;
+import com.example.template.common.dto.PageRequestDto;
 import com.example.template.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class UserController {
             Model model) {
 
         var response = userService
-                .getAllUsers(new PageRequest(page, size, keyword, searchType));
+                .getAllUsers(new PageRequestDto(page, size, keyword, searchType));
         model.addAttribute("data", response);
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
