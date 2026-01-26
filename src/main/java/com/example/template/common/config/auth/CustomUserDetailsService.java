@@ -1,6 +1,6 @@
 package com.example.template.common.config.auth;
 
-import com.example.template.mapper.UserMapper;
+import com.example.template.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

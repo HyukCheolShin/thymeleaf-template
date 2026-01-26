@@ -1,6 +1,6 @@
-package com.example.template.controller;
+package com.example.template.user.controller;
 
-import com.example.template.service.UserService;
+import com.example.template.user.service.UserService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

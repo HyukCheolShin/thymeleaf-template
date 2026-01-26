@@ -1,4 +1,4 @@
-package com.example.template.controller;
+package com.example.template.user.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.template.common.dto.PageRequestDto;
-import com.example.template.service.UserService;
+import com.example.template.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

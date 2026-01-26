@@ -1,7 +1,7 @@
-package com.example.template.controller;
+package com.example.template.file.controller;
 
 import com.example.template.common.dto.ApiResponseDto;
-import com.example.template.service.FileService;
+import com.example.template.file.service.FileService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

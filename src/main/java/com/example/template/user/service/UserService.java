@@ -1,6 +1,7 @@
-package com.example.template.service;
+package com.example.template.user.service;
 
-import com.example.template.mapper.UserMapper;
+import com.example.template.user.mapper.UserMapper;
+import com.example.template.file.service.FileService;
 import com.example.template.common.dto.PageRequestDto;
 import com.example.template.common.dto.PageResponseDto;
 import org.springframework.stereotype.Service;
