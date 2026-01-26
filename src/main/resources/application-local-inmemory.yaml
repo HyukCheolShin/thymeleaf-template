@@ -1,9 +1,15 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/template
-    username: template_user
-    password: template_pwd
-    driver-class-name: org.postgresql.Driver
+    primary:
+      jdbc-url: jdbc:postgresql://localhost:5432/postgres
+      username: postgres
+      password: 1234
+      driver-class-name: org.postgresql.Driver
+    secondary:
+      jdbc-url: jdbc:postgresql://localhost:5433/postgres
+      username: postgres
+      password: 1234
+      driver-class-name: org.postgresql.Driver
   autoconfigure:
     exclude: 
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration

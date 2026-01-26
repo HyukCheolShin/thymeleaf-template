@@ -27,7 +27,7 @@
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
         </root>
-        <logger name="com.example.template" level="DEBUG"/>
+        <logger name="kr.co.aia.ipro" level="DEBUG"/>
     </springProfile>
 
     <springProfile name="dev,stg,prd">
@@ -35,6 +35,6 @@
             <appender-ref ref="FILE"/>
             <appender-ref ref="CONSOLE"/> 
         </root>
-        <logger name="com.example.template" level="INFO"/>
+        <logger name="kr.co.aia.ipro" level="INFO"/>
     </springProfile>
 </configuration>

@@ -1,0 +1,8 @@
+package kr.co.aia.ipro.secondary.mapper;
+
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface SecondaryTestMapper {
+    String selectNow();
+}
