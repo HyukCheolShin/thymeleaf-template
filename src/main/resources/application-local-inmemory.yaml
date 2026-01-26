@@ -1,14 +1,14 @@
 spring:
   datasource:
     primary:
-      jdbc-url: jdbc:postgresql://localhost:5432/postgres
-      username: postgres
-      password: 1234
+      jdbc-url: ENC(DOZFQeZBCfJ+iDosBeiqPPJAhZs2Fgc6evhQpk0b0SuCoSiqETrjTNxjv+U+uPem9s1mgqi7vec=)
+      username: ENC(hEbtchkIjwZvK/HeLx9y/v09p3aWDLCj)
+      password: ENC(M+6bIB6gJ80vO57hvH044Q==)
       driver-class-name: org.postgresql.Driver
     secondary:
-      jdbc-url: jdbc:postgresql://localhost:5433/postgres
-      username: postgres
-      password: 1234
+      jdbc-url: ENC(IXeaZF1Qcx/FUh29tqZ4KQxsxqnAp2J033Ghom8sV8E3qNJwmo9vbOefGheWCu7YOb7XC6ycmgE=)
+      username: ENC(hEbtchkIjwZvK/HeLx9y/v09p3aWDLCj)
+      password: ENC(M+6bIB6gJ80vO57hvH044Q==)
       driver-class-name: org.postgresql.Driver
   autoconfigure:
     exclude: 

@@ -1,23 +1,17 @@
 package kr.co.aia.ipro.common.config;
 
-import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.junit.jupiter.api.Test;
 
-@Configuration
-public class JasyptConfig {
+public class JasyptTest {
 
-    @Value("${jasypt.encryptor.password}")
-    private String encryptorPassword;
-
-    @Bean("jasyptStringEncryptor")
-    public StringEncryptor stringEncryptor() {
+    @Test
+    public void encryptTest() {
+        String password = "test"; // Jasypt Key
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
-        config.setPassword(encryptorPassword);
+        config.setPassword(password);
         config.setAlgorithm("PBEWithMD5AndDES");
         config.setKeyObtentionIterations("1000");
         config.setPoolSize("1");
@@ -26,6 +20,17 @@ public class JasyptConfig {
         config.setIvGeneratorClassName("org.jasypt.iv.NoIvGenerator");
         config.setStringOutputType("base64");
         encryptor.setConfig(config);
-        return encryptor;
+
+        String[] plainTexts = {
+            "jdbc:postgresql://localhost:5432/postgres", // Primary URL
+            "postgres", // Username
+            "1234", // Password
+            "jdbc:postgresql://localhost:5433/postgres" // Secondary URL (Username/PW 동일)
+        };
+
+        for (String plainText : plainTexts) {
+            String encryptedText = encryptor.encrypt(plainText);
+            System.out.println("Plain: " + plainText + " -> ENC(" + encryptedText + ")");
+        }
     }
 }
