@@ -9,6 +9,7 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContext;
@@ -20,6 +21,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @MapperScan(basePackages = "kr.co.aia.dmd.ipro.secondary.mapper", sqlSessionFactoryRef = "secondarySqlSessionFactory")
+@ConditionalOnProperty(prefix = "app.datasource.secondary", name = "enabled", havingValue = "true")
 public class SecondaryDatabaseConfig {
 
     @Bean(name = "secondaryDataSource")
