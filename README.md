@@ -38,12 +38,11 @@
 - **Primary DB (Port 5432)**
   - 역할: 회원, 주문 등 핵심 비즈니스 데이터 처리
   - Java Config: `PrimaryDatabaseConfig.java`
-  - Mapper 패키지: `kr.co.aia.ipro` (Secondary 제외)
+  - Mapper 패키지: `kr.co.aia.dmd.ipro` (Secondary 제외)
 - **Secondary DB (Port 5433)**
   - 역할: 대용량 로그, 이력성 데이터 처리
   - Java Config: `SecondaryDatabaseConfig.java`
-  - Mapper 패키지: `kr.co.aia.ipro.secondary.mapper`
-  - Mapper 패키지: `kr.co.aia.ipro.secondary.mapper`
+  - Mapper 패키지: `kr.co.aia.dmd.ipro.secondary.mapper`
 
 ### 3.2. 엔터프라이즈 보안 (Security)
 - **인증(Authentication)**: `CustomUserDetailsService`를 통한 DB 기반 사용자 인증
@@ -66,23 +65,24 @@
 ## 4. 프로젝트 구조 (Project Structure)
 
 ```text
-src/main/java/kr/co/aia/ipro
+src/main/java/kr/co/aia/dmd
 ├── common              # 공통 인프라 모듈
 │   ├── config          # 스프링 설정 (Security, DB, Redis, Jasypt, WebMvc)
 │   ├── dto             # 공통 DTO (PageRequest 등)
 │   ├── exception       # 전역 예외 처리
 │   └── interceptor     # 요청 로깅 인터셉터
-├── user                # [모듈] 사용자 관리 (Primary DB)
-│   ├── controller      # View 및 API 컨트롤러 분리
-│   ├── service         # 비즈니스 로직
-│   ├── mapper          # MyBatis 인터페이스
-│   └── vo              # Value Object
-├── file                # [모듈] 파일 관리
-│   └── controller      # 파일 업로드/다운로드 API
-└── secondary           # [모듈] 보조 DB 예시 (Secondary DB)
-    ├── controller
-    ├── service
-    └── mapper          # Secondary 전용 매퍼
+├── ipro                # [모듈] 비즈니스 로직
+│   ├── user            # [모듈] 사용자 관리 (Primary DB)
+│   │   ├── controller      # View 및 API 컨트롤러 분리
+│   │   ├── service         # 비즈니스 로직
+│   │   ├── mapper          # MyBatis 인터페이스
+│   │   └── vo              # Value Object
+│   ├── file            # [모듈] 파일 관리
+│   │   └── controller      # 파일 업로드/다운로드 API
+│   └── secondary       # [모듈] 보조 DB 예시 (Secondary DB)
+│       ├── controller
+│       ├── service
+│       └── mapper          # Secondary 전용 매퍼
 ```
 
 ---
