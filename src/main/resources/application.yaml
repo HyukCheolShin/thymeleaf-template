@@ -3,6 +3,11 @@ spring:
     name: ipro
   profiles:
     active: local-inmemory
+  
+app:
+  datasource:
+    secondary:
+      enabled: false  # Secondary DB 활성화 여부 (true/false)
   servlet:
     multipart:
       max-file-size: 10MB
